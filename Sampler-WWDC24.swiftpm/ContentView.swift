@@ -4,6 +4,7 @@ import AVFoundation
 struct ContentView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var recorder: AudioRecorder
+    @EnvironmentObject var audioEngine: AudioEngine
     
     var body: some View {
         VStack(spacing: 0) {
@@ -14,7 +15,7 @@ struct ContentView: View {
             
             Colors.deviceColorGradient
                 .overlay{
-                   KeypadView()
+                    KeypadView(audioPlayer: MultiAudioPlayer(audioEngine: audioEngine))
                 }
         }
         .ignoresSafeArea(edges: .all)

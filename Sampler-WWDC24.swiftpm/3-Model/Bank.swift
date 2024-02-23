@@ -60,7 +60,7 @@ enum Bank {
         }
     }
     
-    func from(playerIndex: Int) -> Bank? {
+    static func from(playerIndex: Int) -> Bank? {
         switch playerIndex {
         case 0:
             Bank.bank1

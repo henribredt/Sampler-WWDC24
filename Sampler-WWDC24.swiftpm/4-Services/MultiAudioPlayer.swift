@@ -24,6 +24,10 @@ struct MultiAudioPlayer {
         audioEngine.playSound(fileURL: audioFileURL, playerIndex: playerIndex, pitch: config.pitch)
     }
     
+    func isPlaying(bank: Bank) -> Bool {
+        return audioEngine.playingBanks.contains(bank)
+    }
+    
     func audioFileURL(for bank: Bank) -> URL {
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let audioFileURL = documentsPath.appendingPathComponent("\(bank.getFileName()).wav")

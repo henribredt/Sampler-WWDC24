@@ -10,8 +10,9 @@ import SwiftUI
 struct KeypadView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var recorder: AudioRecorder
+    @EnvironmentObject var audioEngine: AudioEngine
     
-    let audioPlayer = MultiAudioPlayer(audioEngine: AudioEngine())
+    let audioPlayer: MultiAudioPlayer
     
     var body: some View {
         VStack(spacing: 29) {
@@ -68,14 +69,14 @@ struct KeypadView: View {
             
             HStack(spacing: 30) {
                 ButtonView(kind: .bank, onButtonLabelView: { Text("1") }, belowBtnLabel: "BANK", showStatusLED: true,
-                           statusLEDisOn: recorder.playingBanks.contains(.bank1), statusLEDisBlinking: appState.selectedBank == .bank1, tapAction: {
+                           statusLEDisOn: audioPlayer.isPlaying(bank: .bank1), statusLEDisBlinking: appState.selectedBank == .bank1, tapAction: {
                     audioPlayer.play(.bank1)
                 }, longPressAction: {
                     appState.toggleSelectedBank(base: .bank1)
                 })
                 
                 ButtonView(kind: .bank, onButtonLabelView: { Text("2") }, belowBtnLabel: "BANK", showStatusLED: true,
-                           statusLEDisOn: recorder.playingBanks.contains(.bank2),
+                           statusLEDisOn: audioPlayer.isPlaying(bank: .bank2),
                            statusLEDisBlinking: appState.selectedBank == .bank2, tapAction: {
                     audioPlayer.play(.bank2)
                 }, longPressAction: {
@@ -83,7 +84,7 @@ struct KeypadView: View {
                 })
                 
                 ButtonView(kind: .bank, onButtonLabelView: { Text("3") }, belowBtnLabel: "BANK", showStatusLED: true,
-                           statusLEDisOn: recorder.playingBanks.contains(.bank3),
+                           statusLEDisOn: audioPlayer.isPlaying(bank: .bank3),
                            statusLEDisBlinking: appState.selectedBank == .bank3, tapAction: {
                     audioPlayer.play(.bank3)
                 }, longPressAction: {
@@ -115,6 +116,6 @@ struct KeypadView: View {
 }
 
 #Preview {
-    KeypadView()
+    KeypadView(audioPlayer: MultiAudioPlayer(audioEngine: AudioEngine()))
 }
 
