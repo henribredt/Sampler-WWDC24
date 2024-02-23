@@ -101,6 +101,12 @@ class AudioEngine: ObservableObject {
                 // Store the player and its timer in the dictionary
                 playerTimerDictionary[audioPlayer] = playbackTimer
 
+                // For whatever reason, this is required for running it in Swift Playgrounds.
+                // Works fine without it when running from Xcode
+                if !audioEngine.isRunning {
+                    try? audioEngine.start()
+                }
+                
                 audioPlayer.play()
 
                 if let bank = Bank.from(playerIndex: playerIndex) {
