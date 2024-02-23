@@ -11,6 +11,9 @@ class AppState: ObservableObject {
     @Published var selectedBank: Bank? = nil
     @Published var selectedEffect: Effect? = nil
     
+    @Published var selectedBankHasPitchEdit: Bool = false
+    @Published var selectedBankHasLowPassEdit: Bool = false
+    
     func toggleSelectedBank(base: Bank) {
         if selectedBank == nil || selectedBank != base {
             selectedBank = base
@@ -31,5 +34,5 @@ class AppState: ObservableObject {
 }
 
 enum Effect {
-    case pitch
+    case pitch, lowpass
 }

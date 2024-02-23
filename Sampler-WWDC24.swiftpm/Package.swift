@@ -43,7 +43,7 @@ let package = Package(
             name: "AppModule",
             path: ".",
             resources: [
-                .process("Resources")
+                .process("6-Resources")
             ],
             swiftSettings: [
                 .enableUpcomingFeature("BareSlashRegexLiterals")

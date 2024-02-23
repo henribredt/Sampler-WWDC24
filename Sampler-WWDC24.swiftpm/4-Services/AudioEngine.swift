@@ -45,7 +45,7 @@ class AudioEngine: ObservableObject {
         }
     }
     
-    func playSound(fileURL: URL, playerIndex: Int, pitch: Float = 0) {
+    func playSound(fileURL: URL, playerIndex: Int, pitch: Float = 0, lowPassFrequency: Float = 3500) {
         guard playerIndex < audioPlayers.count else { return }
         
         let audioPlayer = audioPlayers[playerIndex]
@@ -59,10 +59,17 @@ class AudioEngine: ObservableObject {
         pitchEffect.pitch = pitch
         audioEngine.attach(pitchEffect)
         
-        audioEngine.connect(audioPlayer, to: pitchEffect, format: nil)
-        audioEngine.connect(pitchEffect, to: audioEngine.mainMixerNode, format: nil)
+        // Set lowpass effect
+        let lowPassFilter = AVAudioUnitEQ(numberOfBands: 1)
+        lowPassFilter.bands[0].filterType = .lowPass
+        lowPassFilter.bands[0].frequency = lowPassFrequency // Adjust the cutoff frequency as needed in Range 0...22,000.0
+        lowPassFilter.bands[0].bypass = false
+        audioEngine.attach(lowPassFilter)
         
-        // Load and schedule the sound file
+        audioEngine.connect(audioPlayer, to: pitchEffect, format: nil)
+        audioEngine.connect(pitchEffect, to: lowPassFilter, format: nil)
+        audioEngine.connect(lowPassFilter, to: audioEngine.mainMixerNode, format: nil)
+        
         // Load and schedule the sound file
             do {
                 let audioFile = try AVAudioFile(forReading: fileURL)

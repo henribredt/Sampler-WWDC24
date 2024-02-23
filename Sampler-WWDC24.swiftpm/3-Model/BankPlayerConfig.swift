@@ -13,6 +13,11 @@ struct BankPlayerConfig: Codable {
     /// Range: -2400 ... 2.400, 100 is a half tone
     var pitch: Float
     
+    /// Suggested range: 20.000 .... 20
+    /// If set to upper values -> less effect
+    /// If set to lower values -> high effect
+    var lowPassFrequency: Float
+    
     static func save(_ bankConfig: BankPlayerConfig, for bank: Bank) {
         do {
             let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -47,6 +52,6 @@ struct BankPlayerConfig: Codable {
 extension BankPlayerConfig {
     // returns a new, default BankPlayerConfig
     static func newDefault() -> BankPlayerConfig {
-        BankPlayerConfig(pitch: 0)
+        BankPlayerConfig(pitch: 0, lowPassFrequency: 3500)
     }
 }

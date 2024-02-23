@@ -21,7 +21,7 @@ struct MultiAudioPlayer {
             return
         }
         
-        audioEngine.playSound(fileURL: audioFileURL, playerIndex: playerIndex, pitch: config.pitch)
+        audioEngine.playSound(fileURL: audioFileURL, playerIndex: playerIndex, pitch: config.pitch, lowPassFrequency: config.lowPassFrequency)
     }
     
     func isPlaying(bank: Bank) -> Bool {
@@ -60,9 +60,9 @@ extension MultiAudioPlayer {
         
         switch edit {
         case .increase:
-            config.pitch += 100
+            config.pitch += 200
         case .decrease:
-            config.pitch -= 100
+            config.pitch -= 200
         case .reset:
             config.pitch = 0
         }
@@ -70,4 +70,28 @@ extension MultiAudioPlayer {
         BankPlayerConfig.save(config, for: bank)
         play(bank)
     }
+    
+    //MARK: LOWPASS
+        func editLowPassFilter(for bank: Bank, value edit: EditValue) {
+            var config: BankPlayerConfig
+            
+            if let oldConfig = BankPlayerConfig.load(for: bank) {
+                config = oldConfig
+            } else {
+                // if no config file was found, create a new default config
+                config = BankPlayerConfig.newDefault()
+            }
+            
+            switch edit {
+            case .increase:
+                config.lowPassFrequency += 250
+            case .decrease:
+                config.lowPassFrequency -= 250
+            case .reset:
+                config.lowPassFrequency = 3500
+            }
+            
+            BankPlayerConfig.save(config, for: bank)
+            play(bank)
+        }
 }

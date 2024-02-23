@@ -19,7 +19,7 @@ struct KeypadView: View {
             HStack(spacing: 30) {
                 ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "plus.forwardslash.minus") }, belowBtnLabel: "PITCH", showStatusLED: true,
                            statusLEDisOn: appState.selectedEffect == .pitch, statusLEDisBlinking: false, tapAction: {
-
+                    
                     // disable selected bank on tap after edit
                     if appState.selectedEffect == .pitch && appState.selectedBank != nil {
                         appState.selectedBank = nil
@@ -36,19 +36,36 @@ struct KeypadView: View {
                     }
                 })
                 
-                /*
-                 ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "scissors") }, belowBtnLabel: "CUT", showStatusLED: true,
-                 statusLEDisOn: false, statusLEDisBlinking: false, tapAction: {
-                 
-                 }, longPressAction: {
-                 })
-                 */
+                
+                ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "line.3.horizontal.decrease") }, belowBtnLabel: "LOW PASS", showStatusLED: true,
+                           statusLEDisOn: appState.selectedEffect == .lowpass, statusLEDisBlinking: false, tapAction: {
+                    // disable selected bank on tap after edit
+                    if appState.selectedEffect == .lowpass && appState.selectedBank != nil {
+                        appState.selectedBank = nil
+                        appState.selectedEffect = nil
+                    }
+                    
+                    if appState.selectedBank != nil {
+                        appState.toggleSelectedEffect(base: .lowpass)
+                    }
+                }, longPressAction: {
+                    // reset lowpass effect
+                    if let bank = appState.selectedBank {
+                        audioPlayer.editLowPassFilter(for: bank, value: .reset)
+                    }
+                })
+                
                 
                 ButtonView(kind: .control, onButtonLabelView: { Image(systemName: "plus") }, belowBtnLabel: "PLUS", showStatusLED: false,
                            statusLEDisOn: false, statusLEDisBlinking: false, tapAction: {
                     if let bank = appState.selectedBank {
-                        if appState.selectedEffect == .pitch {
+                        switch appState.selectedEffect {
+                        case .pitch:
                             audioPlayer.editPitch(for: bank, value: .increase)
+                        case .lowpass :
+                            audioPlayer.editLowPassFilter(for: bank, value: .increase)
+                        case .none:
+                            return
                         }
                         
                     }
@@ -59,8 +76,14 @@ struct KeypadView: View {
                 ButtonView(kind: .control, onButtonLabelView: { Image(systemName: "minus") }, belowBtnLabel: "MINUS", showStatusLED: false,
                            statusLEDisOn: false, statusLEDisBlinking: false, tapAction: {
                     if let bank = appState.selectedBank {
-                        if appState.selectedEffect == .pitch {
+                        
+                        switch appState.selectedEffect {
+                        case .pitch:
                             audioPlayer.editPitch(for: bank, value: .decrease)
+                        case .lowpass :
+                            audioPlayer.editLowPassFilter(for: bank, value: .decrease)
+                        case .none:
+                            return
                         }
                     }
                 }, longPressAction: {
@@ -73,6 +96,11 @@ struct KeypadView: View {
                     audioPlayer.play(.bank1)
                 }, longPressAction: {
                     appState.toggleSelectedBank(base: .bank1)
+                   
+                    // might do: load config and show in the UI
+                    // might also allow disabeling specific fxs
+                    //let config = BankPlayerConfig.load(for: .bank1)
+                    
                 })
                 
                 ButtonView(kind: .bank, onButtonLabelView: { Text("2") }, belowBtnLabel: "BANK", showStatusLED: true,
@@ -99,7 +127,7 @@ struct KeypadView: View {
                     if recorder.isRecording {
                         recorder.audioRecorder.stop()
                         recorder.isRecording = false
-                    
+                        
                     } else {
                         audioPlayer.resetEffectsAndEdits(for: selectedBank)
                         recorder.startRecording(fileName: selectedBank.getFileName())

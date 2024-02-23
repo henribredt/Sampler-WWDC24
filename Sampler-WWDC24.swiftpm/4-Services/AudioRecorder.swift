@@ -79,6 +79,7 @@ class AudioRecorder : NSObject, ObservableObject {
         }
     }
     
+    /*
     func increasePitch(bank: Bank) {
         if pitch < 3 {
             stopAll()
@@ -96,7 +97,7 @@ class AudioRecorder : NSObject, ObservableObject {
             playRecoding(bank: bank)
         }
     }
-
+*/
     
     
     func playx(bank: Bank, pitchy: Float) {
