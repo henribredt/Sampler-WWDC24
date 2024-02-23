@@ -8,86 +8,181 @@
 import SwiftUI
 import AVFoundation
 
-class AudioRecorder : NSObject , ObservableObject , AVAudioPlayerDelegate {
+class AudioRecorder : NSObject, ObservableObject {
+    var playerBankDictionary: [AVAudioPlayer: Bank] = [:]
     
     @Published var isRecording : Bool = false
     
+    var pitch: Float = 1.0
+    
     @Published var audioRecorder: AVAudioRecorder!
-    @Published var audioPlayer: AVAudioPlayer!
-    @Published var audioURL: URL?
+    @Published var audioPlayers: [AVAudioPlayer] = []
     
- 
+    @Published var playingBanks: [Bank] = []
+    
+    
     func startRecording(fileName: String) {
-            let audioSession = AVAudioSession.sharedInstance()
-
-            do {
-                try audioSession.setCategory(.playAndRecord, mode: .default, options: [])
-                try audioSession.setActive(true)
-
-                let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-                audioURL = documentsPath.appendingPathComponent("\(fileName).wav")
-
-                let settings: [String: Any] = [
-                    AVFormatIDKey: kAudioFormatLinearPCM,
-                    AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
-                    AVEncoderBitRateKey: 320000,
-                    AVNumberOfChannelsKey: 2,
-                    AVSampleRateKey: 44100.0
-                ]
-
-                audioRecorder = try AVAudioRecorder(url: audioURL!, settings: settings)
-                audioRecorder.record()
-
-            } catch {
-                print("Error setting up recording session: \(error.localizedDescription)")
-            }
-        }
-    
-    func playRecoding(fileName: String){
-        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let playAudioURL = documentsPath.appendingPathComponent("\(fileName).wav")
+        let audioSession = AVAudioSession.sharedInstance()
         
-       
-            do {
-                audioPlayer = try AVAudioPlayer(contentsOf: playAudioURL)
-                audioPlayer.play()
-            } catch {
-                print("Error playing audio: \(error.localizedDescription)")
-            }
+        do {
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [])
+            try audioSession.setActive(true)
+            
+            let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let audioURL = documentsPath.appendingPathComponent("\(fileName).wav")
+            
+            let settings: [String: Any] = [
+                AVFormatIDKey: kAudioFormatLinearPCM,
+                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
+                AVEncoderBitRateKey: 320000,
+                AVNumberOfChannelsKey: 2,
+                AVSampleRateKey: 44100.0
+            ]
+            
+            audioRecorder = try AVAudioRecorder(url: audioURL, settings: settings)
+            audioRecorder.record()
+            
+        } catch {
+            print("Error setting up recording session: \(error.localizedDescription)")
+        }
+    }
+    
+    func playRecoding(bank: Bank){
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let playAudioURL = documentsPath.appendingPathComponent("\(bank.getFileName()).wav")
+        
+        do {
+            let audioPlayer = try AVAudioPlayer(contentsOf: playAudioURL)
+            audioPlayer.delegate = self // Set the delegate to receive playback completion events
+            audioPlayer.enableRate = true
+            
+            let config = BankConfig.load(for: bank)
+            
+            audioPlayer.rate = config?.pitch ?? 1.0
+            audioPlayer.play()
+            
+            // Associate the audioPlayer with the bank using a dictionary
+            playerBankDictionary[audioPlayer] = bank
+            
+            audioPlayers.append(audioPlayer)
+            playingBanks.append(bank)
+            print("Audio players: \(audioPlayers.count)")
+        } catch {
+            print("Error playing audio: \(error.localizedDescription)")
+        }
         
     }
     
-    func play() throws {
-        let engine = AVAudioEngine()
-        let speedControl = AVAudioUnitVarispeed()
-        var pitchControl = AVAudioUnitTimePitch()
-        
-        pitchControl.pitch += 50
-        
-        // 1: load the file
-        guard let url = audioURL else {
-            return
+    func stopAll() {
+        for player in audioPlayers {
+            player.stop()
         }
-        let file = try AVAudioFile(forReading: url)
+    }
+    
+    func increasePitch(bank: Bank) {
+        if pitch < 3 {
+            stopAll()
+            pitch += 0.2
+            BankConfig.save(BankConfig(pitch: pitch), for: bank)
+            playRecoding(bank: bank)
+        }
+    }
 
-        // 2: create the audio player
-        let audioPlayer = AVAudioPlayerNode()
+    func decreasePitch(bank: Bank) {
+        if pitch > -0.8 {
+            stopAll()
+            pitch -= 0.2
+            BankConfig.save(BankConfig(pitch: pitch), for: bank)
+            playRecoding(bank: bank)
+        }
+    }
 
-        // 3: connect the components to our playback engine
-        engine.attach(audioPlayer)
-        engine.attach(pitchControl)
-        engine.attach(speedControl)
+    
+    
+    func playx(bank: Bank, pitchy: Float) {
+        let audioEngine = AVAudioEngine()
+            let audioPlayerNode = AVAudioPlayerNode()
+          //  let pitchEffect = AVAudioUnitTimePitch()
+        
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let fileURL = documentsPath.appendingPathComponent("\(bank.getFileName()).wav")
+        let audioFile = try! AVAudioFile(forReading: fileURL)
+        
+            audioEngine.attach(audioPlayerNode)
+       //     audioEngine.attach(pitchEffect)
+            
+        //
+       // audioEngine.connect(audioPlayerNode, to: pitchEffect, format: nil)
+        audioEngine.connect(audioPlayerNode, to: audioEngine.mainMixerNode, format: audioFile.processingFormat)
+        
+        // Start the audio engine
+        do {
+           
+    
+            // Load an audio file
+            
+            
+         //   pitchEffect.pitch = pitch * 1200
+            
+            // Schedule the audio file for playback
+            audioPlayerNode.scheduleFile(audioFile, at: nil)
+            
+            // Start the audio player node
+            try audioEngine.start()
+            audioPlayerNode.play()
+            
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+}
 
-        // 4: arrange the parts so that output from one is input to another
-        engine.connect(audioPlayer, to: speedControl, format: nil)
-        engine.connect(speedControl, to: pitchControl, format: nil)
-        engine.connect(pitchControl, to: engine.mainMixerNode, format: nil)
+extension AudioRecorder: AVAudioPlayerDelegate {
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        if let bank = playerBankDictionary[player] {
+            if let index = audioPlayers.firstIndex(of: player) {
+                audioPlayers.remove(at: index)
+                
+                // Turn LED off after playing
+                if let index = playingBanks.firstIndex(of: bank) {
+                    playingBanks.remove(at: index)
+                }
+            }
+        }
+    }
+}
 
-        // 5: prepare the player to play its file from the beginning
-        audioPlayer.scheduleFile(file, at: nil)
 
-        // 6: start the engine and player
-        try engine.start()
-        audioPlayer.play()
+struct BankConfig: Codable {
+    let pitch: Float
+    
+    static func save(_ bankConfig: BankConfig, for bank: Bank) {
+        do {
+            let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let url = documentsPath.appendingPathComponent("\(bank.getFileName()).json")
+            
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            let data = try encoder.encode(bankConfig)
+            try data.write(to: url)
+            print("Person saved successfully as JSON")
+        } catch {
+            print("Error saving person as JSON: \(error.localizedDescription)")
+        }
+    }
+    
+    static func load(for bank: Bank) -> BankConfig? {
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let url = documentsPath.appendingPathComponent("\(bank.getFileName()).json")
+        
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            let bankConfig = try decoder.decode(BankConfig.self, from: data)
+            return bankConfig
+        } catch {
+            print("Error loading person from JSON: \(error.localizedDescription)")
+            return nil
+        }
     }
 }

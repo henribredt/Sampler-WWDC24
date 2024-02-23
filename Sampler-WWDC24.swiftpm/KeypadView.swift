@@ -6,107 +6,94 @@
 //
 
 import SwiftUI
-/*
+
 struct KeypadView: View {
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var recorder: AudioRecorder
     
     var body: some View {
-        VStack(spacing: 29){
-           
-            HStack(spacing: 32) {
-                ButtonDefault(role: .fx, isActive: appState.fxPitchIsActive, onButtonLabel: "", belowButtonLabel: "PITCH", tapAction: {
+        VStack(spacing: 29) {
+            HStack(spacing: 30) {
+                ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "wand.and.stars") }, belowBtnLabel: "PITCH", showStatusLED: true,
+                           statusLEDisOn: appState.fxPitchIsActive, statusLEDisBlinking: false, tapAction: {
                     appState.fxPitchIsActive.toggle()
                 }, longPressAction: {
-                    
                 })
-                ButtonDefault(role: .fx, isActive: appState.fxLoIsActive, onButtonLabel: "", belowButtonLabel: "HIGH", tapAction: {
-                    appState.fxLoIsActive.toggle()
+                
+                /*
+                ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "scissors") }, belowBtnLabel: "CUT", showStatusLED: true,
+                           statusLEDisOn: false, statusLEDisBlinking: false, tapAction: {
+                   
+                }, longPressAction: {
+                })
+                */
+                
+                ButtonView(kind: .control, onButtonLabelView: { Image(systemName: "plus") }, belowBtnLabel: "PLUS", showStatusLED: false,
+                           statusLEDisOn: false, statusLEDisBlinking: false, tapAction: {
+                    if let bank = appState.selectedBank {
+                        recorder.increasePitch(bank: bank)
+                    }
                 }, longPressAction: {
                     
                 })
-                ButtonDefault(role: .fx, isActive: appState.fxHiIsActive, onButtonLabel: "", belowButtonLabel: "LOW", tapAction: {
-                    appState.fxHiIsActive.toggle()
+                
+                ButtonView(kind: .control, onButtonLabelView: { Image(systemName: "minus") }, belowBtnLabel: "MINUS", showStatusLED: false,
+                           statusLEDisOn: false, statusLEDisBlinking: false, tapAction: {
+                    if let bank = appState.selectedBank {
+                        recorder.decreasePitch(bank: bank)
+                    }
                 }, longPressAction: {
-                    
-                })
-                ButtonDefault(role: .fx, isActive: appState.fxBandIsActive, onButtonLabel: "", belowButtonLabel: "BAND", tapAction: {
-                    appState.fxBandIsActive.toggle()
-                }, longPressAction: {
-                    
                 })
             }
-            HStack(spacing: 32) {
-                ButtonDefault(role: .regular, isActive: appState.selectedBank == .bank1, onButtonLabel: "1", belowButtonLabel: "BANK", tapAction: {
-                    AudioEngine.playSound()
+            
+            HStack(spacing: 30) {
+                ButtonView(kind: .bank, onButtonLabelView: { Text("1") }, belowBtnLabel: "BANK", showStatusLED: true,
+                           statusLEDisOn: recorder.playingBanks.contains(.bank1) || appState.selectedBank == .bank1, statusLEDisBlinking: false, tapAction: {
+                    recorder.playx(bank: .bank1, pitchy: 2)
                 }, longPressAction: {
                     appState.toggleSelectedBank(base: .bank1)
                 })
-                ButtonDefault(role: .regular, isActive: appState.selectedBank == .bank2, onButtonLabel: "2", belowButtonLabel: "BANK", tapAction: {
-                    print("tap")
+                
+                ButtonView(kind: .bank, onButtonLabelView: { Text("2") }, belowBtnLabel: "BANK", showStatusLED: true,
+                           statusLEDisOn: recorder.playingBanks.contains(.bank2) || appState.selectedBank == .bank2,
+                           statusLEDisBlinking: false, tapAction: {
+                    recorder.playRecoding(bank: .bank2)
                 }, longPressAction: {
                     appState.toggleSelectedBank(base: .bank2)
                 })
-                ButtonDefault(role: .regular, isActive: appState.selectedBank == .bank3, onButtonLabel: "3", belowButtonLabel: "BANK", tapAction: {
-                    print("tap")
+                
+                ButtonView(kind: .bank, onButtonLabelView: { Text("3") }, belowBtnLabel: "BANK", showStatusLED: true,
+                           statusLEDisOn: recorder.playingBanks.contains(.bank3) || appState.selectedBank == .bank3,
+                           statusLEDisBlinking: false, tapAction: {
+                    recorder.playRecoding(bank: .bank3)
                 }, longPressAction: {
                     appState.toggleSelectedBank(base: .bank3)
                 })
-                ButtonDefault(role: .control, isActive: false, onButtonLabel: "+", belowButtonLabel: "PLUS", showStatusLED: false, tapAction: {
-                    print("tap")
-                }, longPressAction: {
-                    print("tap")
-                })
-            }
-            HStack(spacing: 32) {
-                ButtonDefault(role: .regular, isActive: appState.selectedBank == .bank4, onButtonLabel: "4", belowButtonLabel: "BANK", tapAction: {
-                    print("tap")
-                }, longPressAction: {
-                    appState.toggleSelectedBank(base: .bank4)
-                })
-                ButtonDefault(role: .regular, isActive: appState.selectedBank == .bank5, onButtonLabel: "5", belowButtonLabel: "BANK", tapAction: {
-                    print("tap")
-                }, longPressAction: {
-                    appState.toggleSelectedBank(base: .bank5)
-                })
-                ButtonDefault(role: .regular, isActive: appState.selectedBank == .bank6, onButtonLabel: "6", belowButtonLabel: "BANK", tapAction: {
-                    print("tap")
-                }, longPressAction: {
-                    appState.toggleSelectedBank(base: .bank6)
-                })
-                ButtonDefault(role: .control, isActive: false, onButtonLabel: "−", belowButtonLabel: "MINUS", showStatusLED: false, tapAction: {
-                    print("tap")
-                }, longPressAction: {
-                    print("tap")
-                })
-            }
-            HStack(spacing: 32) {
-                ButtonDefault(role: .regular, isActive: appState.selectedBank == .bank7, onButtonLabel: "7", belowButtonLabel: "BANK", tapAction: {
-                    print("tap")
-                }, longPressAction: {
-                    appState.toggleSelectedBank(base: .bank7)
-                })
-                ButtonDefault(role: .regular, isActive: appState.selectedBank == .bank8, onButtonLabel: "8", belowButtonLabel: "BANK", tapAction: {
-                    print("tap")
-                }, longPressAction: {
-                    appState.toggleSelectedBank(base: .bank8)
-                })
-                ButtonDefault(role: .regular, isActive: appState.selectedBank == .bank9, onButtonLabel: "9", belowButtonLabel: "BANK", tapAction: {
+                
+                ButtonView(kind: .rec, onButtonLabelView: { Text("REC") }, belowBtnLabel: "REC", showStatusLED: true, statusLEDisOn: recorder.isRecording, statusLEDisBlinking: false, tapAction: {
+                    guard let selectedBank = appState.selectedBank else {
+                        return
+                    }
+                    
+                    if recorder.isRecording {
+                        recorder.audioRecorder.stop()
+                        recorder.isRecording = false
+                        appState.selectedBank = nil
+                    } else {
+                        recorder.startRecording(fileName: selectedBank.getFileName())
+                        recorder.isRecording = true
+                    }
                     
                 }, longPressAction: {
-                    appState.toggleSelectedBank(base: .bank9)
-                })
-                ButtonDefault(role: .rec, isActive: appState.recIsActive, onButtonLabel: "REC", belowButtonLabel: "REC", tapAction: {
-                    appState.recIsActive.toggle()
-                }, longPressAction: {
-                    print("tap")
+                    
                 })
             }
         }
     }
-             
+    
 }
 
 #Preview {
     KeypadView()
 }
-             */
+

@@ -24,9 +24,9 @@ enum ButtonKind {
     }
 }
 
-struct ButtonView: View {
+struct ButtonView<OnButtonLabelView: View>: View {
     let kind: ButtonKind
-    let onBtnLabel: String
+    @ViewBuilder let onButtonLabelView: OnButtonLabelView
     let belowBtnLabel: String
     let showStatusLED: Bool
     let statusLEDisOn: Bool
@@ -48,7 +48,7 @@ struct ButtonView: View {
                     .shadow(color: .black.opacity(0.25), radius: 5 , x: 8, y: 8)
                     .frame(width: 100, height: 100)
                     .overlay(alignment: .topLeading) {
-                        Text(onBtnLabel)
+                        onButtonLabelView
                             .padding(14)
                             .font(.body.monospaced().weight(.semibold))
                             .foregroundStyle(Colors.labelColorWhite)
@@ -67,13 +67,15 @@ struct ButtonView: View {
             })
             
             HStack(spacing: 10){
-                Circle()
-                    .fill(
-                        .shadow(.inner(color: Color.black.opacity(0.5) ,radius: 1, x:0, y: 0))
-                        .shadow(.inner(color: .black.opacity(0.2), radius: 2, x: 2, y: 2))
-                    )
-                    .foregroundStyle(statusLEDisOn ? Colors.onStatusLEDGradient : Colors.offStatusLEDGradient)
-                    .frame(width: 16, height: 16)
+                if showStatusLED {
+                    Circle()
+                        .fill(
+                            .shadow(.inner(color: Color.black.opacity(0.5) ,radius: 1, x:0, y: 0))
+                            .shadow(.inner(color: .black.opacity(0.2), radius: 2, x: 2, y: 2))
+                        )
+                        .foregroundStyle(statusLEDisOn ? Colors.onStatusLEDGradient : Colors.offStatusLEDGradient)
+                        .frame(width: 16, height: 16)
+                }
                 
                 Text(belowBtnLabel)
                     .font(.footnote.monospaced().weight(.semibold))
@@ -89,7 +91,7 @@ struct ButtonView: View {
     @State var isSelected: Bool = true
     @State var isBlinking: Bool = false
     
-    return ButtonView(kind: .rec, onBtnLabel: "REC", belowBtnLabel: "RECORD", showStatusLED: true, statusLEDisOn: isSelected, statusLEDisBlinking: isBlinking, tapAction: {
+    return ButtonView(kind: .rec, onButtonLabelView:{ Text("REC") }, belowBtnLabel: "RECORD", showStatusLED: true, statusLEDisOn: isSelected, statusLEDisBlinking: isBlinking, tapAction: {
         isSelected.toggle()
     }, longPressAction: {
         isBlinking.toggle()
