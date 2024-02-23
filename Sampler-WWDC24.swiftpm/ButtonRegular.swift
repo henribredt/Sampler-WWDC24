@@ -73,7 +73,9 @@ struct ButtonView<OnButtonLabelView: View>: View {
                             .shadow(.inner(color: Color.black.opacity(0.5) ,radius: 1, x:0, y: 0))
                             .shadow(.inner(color: .black.opacity(0.2), radius: 2, x: 2, y: 2))
                         )
+                        .blinking(isBlinking: statusLEDisBlinking)
                         .foregroundStyle(statusLEDisOn ? Colors.onStatusLEDGradient : Colors.offStatusLEDGradient)
+                        
                         .frame(width: 16, height: 16)
                 }
                 

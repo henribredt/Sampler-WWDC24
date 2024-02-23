@@ -56,7 +56,7 @@ class AudioRecorder : NSObject, ObservableObject {
             audioPlayer.delegate = self // Set the delegate to receive playback completion events
             audioPlayer.enableRate = true
             
-            let config = BankConfig.load(for: bank)
+            let config = BankPlayerConfig.load(for: bank)
             
             audioPlayer.rate = config?.pitch ?? 1.0
             audioPlayer.play()
@@ -83,7 +83,7 @@ class AudioRecorder : NSObject, ObservableObject {
         if pitch < 3 {
             stopAll()
             pitch += 0.2
-            BankConfig.save(BankConfig(pitch: pitch), for: bank)
+            BankPlayerConfig.save(BankPlayerConfig(pitch: pitch), for: bank)
             playRecoding(bank: bank)
         }
     }
@@ -92,7 +92,7 @@ class AudioRecorder : NSObject, ObservableObject {
         if pitch > -0.8 {
             stopAll()
             pitch -= 0.2
-            BankConfig.save(BankConfig(pitch: pitch), for: bank)
+            BankPlayerConfig.save(BankPlayerConfig(pitch: pitch), for: bank)
             playRecoding(bank: bank)
         }
     }
@@ -153,36 +153,3 @@ extension AudioRecorder: AVAudioPlayerDelegate {
 }
 
 
-struct BankConfig: Codable {
-    let pitch: Float
-    
-    static func save(_ bankConfig: BankConfig, for bank: Bank) {
-        do {
-            let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            let url = documentsPath.appendingPathComponent("\(bank.getFileName()).json")
-            
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .prettyPrinted
-            let data = try encoder.encode(bankConfig)
-            try data.write(to: url)
-            print("Person saved successfully as JSON")
-        } catch {
-            print("Error saving person as JSON: \(error.localizedDescription)")
-        }
-    }
-    
-    static func load(for bank: Bank) -> BankConfig? {
-        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let url = documentsPath.appendingPathComponent("\(bank.getFileName()).json")
-        
-        do {
-            let data = try Data(contentsOf: url)
-            let decoder = JSONDecoder()
-            let bankConfig = try decoder.decode(BankConfig.self, from: data)
-            return bankConfig
-        } catch {
-            print("Error loading person from JSON: \(error.localizedDescription)")
-            return nil
-        }
-    }
-}

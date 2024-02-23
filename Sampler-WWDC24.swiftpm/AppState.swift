@@ -8,34 +8,28 @@
 import SwiftUI
 
 class AppState: ObservableObject {
-    @Published var editModeIsActive = false
     @Published var selectedBank: Bank? = nil
+    @Published var selectedEffect: Effect? = nil
     
     func toggleSelectedBank(base: Bank) {
         if selectedBank == nil || selectedBank != base {
             selectedBank = base
-            editModeIsActive = true
         } else {
             selectedBank = nil
-            editModeIsActive = false
+            // if no bank is selected, no effect should be selected too
+            selectedEffect = nil
         }
     }
     
-    @Published var fxPitchIsActive = false
-    @Published var fxLoIsActive = false
-    @Published var fxHiIsActive = false
-    @Published var fxBandIsActive = false
-    @Published var recIsActive = false
-    @Published var buttonPlusIsActive = false
-    @Published var buttonMinusIsActive = false
-    
-    @Published var button1IsActive = false
-    @Published var button2IsActive = false
-    @Published var button3IsActive = false
-    @Published var button4IsActive = false
-    @Published var button5IsActive = false
-    @Published var button6IsActive = false
-    @Published var button7IsActive = false
-    @Published var button8IsActive = false
-    @Published var button9IsActive = false
+    func toggleSelectedEffect(base: Effect) {
+        if selectedEffect == nil || selectedEffect != base {
+            selectedEffect = base
+        } else {
+            selectedEffect = nil
+        }
+    }
+}
+
+enum Effect {
+    case pitch
 }
