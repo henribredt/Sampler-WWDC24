@@ -18,6 +18,9 @@ struct BankPlayerConfig: Codable {
     /// If set to lower values -> high effect
     var lowPassFrequency: Float
     
+    /// Volume, Range: 0. .. 1
+    var gain: Float
+    
     static func save(_ bankConfig: BankPlayerConfig, for bank: Bank) {
         do {
             let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -52,6 +55,6 @@ struct BankPlayerConfig: Codable {
 extension BankPlayerConfig {
     // returns a new, default BankPlayerConfig
     static func newDefault() -> BankPlayerConfig {
-        BankPlayerConfig(pitch: 0, lowPassFrequency: 3500)
+        BankPlayerConfig(pitch: Effect.pitch.defaultValue(), lowPassFrequency: Effect.lowpass.defaultValue() , gain: Effect.gain.defaultValue())
     }
 }

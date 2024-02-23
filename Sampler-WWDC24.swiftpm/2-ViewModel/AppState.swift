@@ -32,7 +32,3 @@ class AppState: ObservableObject {
         }
     }
 }
-
-enum Effect {
-    case pitch, lowpass
-}

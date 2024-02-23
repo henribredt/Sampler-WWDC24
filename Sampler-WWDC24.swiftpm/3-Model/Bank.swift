@@ -74,6 +74,8 @@ enum Bank {
             Bank.bank5
         case 5:
             Bank.bank6
+        case 6:
+            Bank.bank7
         case 7:
             Bank.bank8
         case 8:

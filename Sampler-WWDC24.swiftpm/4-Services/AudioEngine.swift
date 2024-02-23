@@ -45,7 +45,8 @@ class AudioEngine: ObservableObject {
         }
     }
     
-    func playSound(fileURL: URL, playerIndex: Int, pitch: Float = 0, lowPassFrequency: Float = 3500) {
+    func playSound(fileURL: URL, playerIndex: Int, pitch: Float = Effect.pitch.defaultValue(), lowPassFrequency: Float = Effect.lowpass.defaultValue(), gain: Float = Effect.gain.defaultValue()) {
+        
         guard playerIndex < audioPlayers.count else { return }
         
         let audioPlayer = audioPlayers[playerIndex]
@@ -53,6 +54,9 @@ class AudioEngine: ObservableObject {
         // Stop and reset the player before playing a new sound
         audioPlayer.stop()
         audioPlayer.reset()
+        
+        // Set gain
+        audioPlayer.volume = gain
         
         // Set pitch effect
         let pitchEffect = AVAudioUnitTimePitch()

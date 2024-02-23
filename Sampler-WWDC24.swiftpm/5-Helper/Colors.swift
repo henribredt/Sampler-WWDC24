@@ -26,7 +26,7 @@ struct Colors {
     
     static let grayButtonGradient = LinearGradient(gradient: Gradient(colors: [Color(hex: "AAA5A5"), Color(hex: "8F8F8F")]), startPoint: .topLeading, endPoint: .bottomTrailing)
     static let orangeButtonGradient = LinearGradient(gradient: Gradient(colors: [Color(hex: "EC4C2C"), Color(hex: "E75127")]), startPoint: .topLeading, endPoint: .bottomTrailing)
-    static let blackButtonGradient = LinearGradient(gradient: Gradient(colors: [Color(hex: "292929"), Color(hex: "1E1E1E")]), startPoint: .topLeading, endPoint: .bottomTrailing)
+    static let blackButtonGradient = LinearGradient(gradient: Gradient(colors: [Color(hex: "323232"), Color(hex: "2C2C2C")]), startPoint: .topLeading, endPoint: .bottomTrailing)
     static let darkGrayButtonGradient = LinearGradient(gradient: Gradient(colors: [Color(hex: "6E6E6E"), Color(hex: "565555")]), startPoint: .topLeading, endPoint: .bottomTrailing)
     
     static let onStatusLEDGradient = LinearGradient(gradient: Gradient(colors: [Color(hex: "D63A1E"), Color(hex: "E99E3D")]), startPoint: .topLeading, endPoint: .bottomTrailing)
