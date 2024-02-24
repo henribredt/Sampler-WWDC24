@@ -32,8 +32,24 @@ class AppState: ObservableObject {
     func toggleSelectedEffect(base: Effect) {
         if selectedEffect == nil || selectedEffect != base {
             selectedEffect = base
+            updateEffectRangeValues(effect: base)
+            
+            // update current Effect value
+            let currentConfig = BankPlayerConfig.load(for: selectedBank!)
+            selectedEffectCurrentValue = Double(currentConfig?.getCurrentValueFor(base) ?? 0)
         } else {
             selectedEffect = nil
+        }
+    }
+    
+    func updateEffectRangeValues(effect: Effect) {
+        if effect == .lowpass {
+            // invert for lowpasss
+            selectedEffectMinValue = Double(effect.range().upperBound)
+            selectedEffectMaxValue = Double(effect.range().lowerBound)
+        } else {
+            selectedEffectMinValue = Double(effect.range().lowerBound)
+            selectedEffectMaxValue = Double(effect.range().upperBound)
         }
     }
 }

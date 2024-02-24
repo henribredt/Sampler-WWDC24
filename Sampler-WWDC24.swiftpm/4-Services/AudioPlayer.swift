@@ -9,6 +9,7 @@ import Foundation
 
 struct AudioPlayer {
     let audioEngine: AudioEngine
+    let appState: AppState
     
     /// - returns: Duration of the playing systemSound
     @discardableResult
@@ -65,15 +66,15 @@ extension AudioPlayer {
         
         switch edit {
         case .increase:
-            if config.pitch < 2200 {
-                config.pitch += 200
+            if config.pitch < Effect.pitch.range().upperBound {
+                config.pitch += Effect.pitch.stepSize()
             } else {
                 playSystemSound(.invalidAction)
                 skipPlay = true
             }
         case .decrease:
-            if config.pitch > -2000 {
-                config.pitch -= 200
+            if config.pitch > Effect.pitch.range().lowerBound {
+                config.pitch -= Effect.pitch.stepSize()
             } else {
                 playSystemSound(.invalidAction)
                 skipPlay = true
@@ -86,6 +87,7 @@ extension AudioPlayer {
             BankPlayerConfig.save(config, for: bank)
             play(bank)
         }
+        appState.selectedEffectCurrentValue = Double(config.pitch)
     }
     
     //MARK: LOWPASS
@@ -102,15 +104,15 @@ extension AudioPlayer {
             
             switch edit {
             case .increase:
-                if config.lowPassFrequency < 20000 {
-                    config.lowPassFrequency += 250
+                if config.lowPassFrequency < Effect.lowpass.range().upperBound {
+                    config.lowPassFrequency += Effect.lowpass.stepSize()
                 } else {
                     playSystemSound(.invalidAction)
                     skipPlay = true
                 }
             case .decrease:
-                if config.lowPassFrequency > 250{
-                    config.lowPassFrequency -= 250
+                if config.lowPassFrequency > Effect.lowpass.range().lowerBound{
+                    config.lowPassFrequency -= Effect.lowpass.stepSize()
                 } else {
                     playSystemSound(.invalidAction)
                     skipPlay = true
@@ -123,6 +125,8 @@ extension AudioPlayer {
                 BankPlayerConfig.save(config, for: bank)
                 play(bank)
             }
+            appState.selectedEffectCurrentValue = Double(config.lowPassFrequency)
+            print(config)
         }
     
     //MARK: GAIN
@@ -139,15 +143,15 @@ extension AudioPlayer {
         
         switch edit {
         case .increase:
-            if config.gain < 0.95 {
-                config.gain += 0.1
+            if config.gain < Effect.gain.range().upperBound {
+                config.gain = min(1, config.gain + Effect.gain.stepSize())
             } else {
                 playSystemSound(.invalidAction)
                 skipPlay = true
             }
         case .decrease:
-            if config.gain > 0.06 {
-                config.gain -= 0.1
+            if config.gain > Effect.gain.range().lowerBound {
+                config.gain = max(0, config.gain - Effect.gain.stepSize())
             } else {
                 playSystemSound(.invalidAction)
                 skipPlay = true
@@ -160,6 +164,7 @@ extension AudioPlayer {
             BankPlayerConfig.save(config, for: bank)
             play(bank)
         }
+        appState.selectedEffectCurrentValue = Double(config.gain)
     }
     
     //MARK: TrimFromStart
@@ -176,15 +181,15 @@ extension AudioPlayer {
         
         switch edit {
         case .increase:
-            if config.trimFromStart < 2 {
-                config.trimFromStart += 0.1
+            if config.trimFromStart < Double(Effect.trimFromStart.range().upperBound) {
+                config.trimFromStart += Double(Effect.trimFromStart.stepSize())
             } else {
                 playSystemSound(.invalidAction)
                 skipPlay = true
             }
         case .decrease:
-            if config.trimFromStart > 0.15 {
-                config.trimFromStart -= 0.1
+            if config.trimFromStart > Double(Effect.trimFromStart.range().lowerBound) {
+                config.trimFromStart -= Double(Effect.trimFromStart.stepSize())
             } else if config.trimFromStart > 0 {
                 config.trimFromStart = 0
             } else {
@@ -199,7 +204,6 @@ extension AudioPlayer {
             BankPlayerConfig.save(config, for: bank)
             play(bank)
         }
-        
-        print(config.trimFromStart)
+        appState.selectedEffectCurrentValue = Double(config.trimFromStart)
     }
 }

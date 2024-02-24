@@ -25,17 +25,24 @@ struct ContentView: View {
                     Colors.displayColor
                         .frame(height: 360)
                         .overlay {
+                            DisplayView()
+                        }
+                        .overlay(alignment: .bottomLeading) {
+                            HStack{
+                                Rectangle()
+                                    .frame(width: 60, height: 1)
+                                    .foregroundStyle(Colors.printedOnDeviceColor)
+                                Text("POCKET SAMPLER WWDC24")
+                                Rectangle()
+                                    .frame(height: 1)
+                                    .foregroundStyle(Colors.printedOnDeviceColor)
+                            }
+                                .onDisplayPrint()               .padding()
                         }
                     
                     Colors.deviceColorGradient
-                        .overlay(alignment: .topLeading, content: {
-                            Text("POCKET SAMPLER WWDC24")
-                                .padding()
-                                .font(.caption.monospaced().weight(.semibold))
-                                .foregroundStyle(Colors.labelColorGrey)
-                        })
                         .overlay{
-                            KeypadView(audioPlayer: AudioPlayer(audioEngine: audioEngine))
+                            KeypadView(audioPlayer: AudioPlayer(audioEngine: audioEngine, appState: appState))
                         }
                 }
                 

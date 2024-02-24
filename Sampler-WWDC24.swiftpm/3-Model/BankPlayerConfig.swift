@@ -53,6 +53,19 @@ struct BankPlayerConfig: Codable {
             return nil
         }
     }
+    
+    func getCurrentValueFor(_ effect: Effect) -> Float{
+        switch effect {
+        case .pitch:
+            return pitch
+        case .lowpass:
+            return lowPassFrequency
+        case .gain:
+            return gain
+        case .trimFromStart:
+            return Float(trimFromStart)
+        }
+    }
 }
 
 extension BankPlayerConfig {

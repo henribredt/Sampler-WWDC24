@@ -74,7 +74,8 @@ struct KeypadView: View {
                         case .pitch:
                             audioPlayer.editPitch(for: bank, value: .increase)
                         case .lowpass :
-                            audioPlayer.editLowPassFilter(for: bank, value: .increase)
+                            // inverted for lowpass
+                            audioPlayer.editLowPassFilter(for: bank, value: .decrease)
                         case .gain:
                             audioPlayer.editGain(for: bank, value: .increase)
                         case .trimFromStart:
@@ -120,7 +121,8 @@ struct KeypadView: View {
                         case .pitch:
                             audioPlayer.editPitch(for: bank, value: .decrease)
                         case .lowpass :
-                            audioPlayer.editLowPassFilter(for: bank, value: .decrease)
+                            // inverted for lowpass
+                            audioPlayer.editLowPassFilter(for: bank, value: .increase)
                         case .gain:
                             audioPlayer.editGain(for: bank, value: .decrease)
                         case .trimFromStart:
@@ -271,18 +273,22 @@ struct KeypadView: View {
         if recorder.isRecording {
             return
         }
-        
-        // reset effect
-        if let bank = appState.selectedBank {
-            switch effect {
-            case .pitch:
-                audioPlayer.editPitch(for: bank, value: .reset)
-            case .lowpass:
-                audioPlayer.editLowPassFilter(for: bank, value: .reset)
-            case .gain:
-                audioPlayer.editGain(for: bank, value: .reset)
-            case .trimFromStart:
-                audioPlayer.editTrimFromStart(for: bank, value: .reset)
+        if appState.selectedEffect == effect {
+            // reset effect
+            if let bank = appState.selectedBank {
+                switch effect {
+                case .pitch:
+                    audioPlayer.editPitch(for: bank, value: .reset)
+                case .lowpass:
+                    audioPlayer.editLowPassFilter(for: bank, value: .reset)
+                case .gain:
+                    audioPlayer.editGain(for: bank, value: .reset)
+                case .trimFromStart:
+                    audioPlayer.editTrimFromStart(for: bank, value: .reset)
+                }
+            }
+            else {
+                audioPlayer.playSystemSound(.invalidAction)
             }
         } else {
             audioPlayer.playSystemSound(.invalidAction)
@@ -291,6 +297,6 @@ struct KeypadView: View {
 }
 
 #Preview {
-    KeypadView(audioPlayer: AudioPlayer(audioEngine: AudioEngine()))
+    KeypadView(audioPlayer: AudioPlayer(audioEngine: AudioEngine(), appState: AppState()))
 }
 
