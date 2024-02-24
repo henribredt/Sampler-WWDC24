@@ -61,12 +61,12 @@ struct ButtonView<OnButtonLabelView: View>: View {
                     .onTapGesture {
                         tapAction()
                     }
-                    .onLongPressGesture(minimumDuration: 0.2) {
+                    .onLongPressGesture(minimumDuration: 0.15) {
                         longPressAction()
                     }
             })
             
-            HStack(spacing: 10){
+            HStack(spacing: 8){
                 if showStatusLED {
                     Circle()
                         .fill(
@@ -80,7 +80,7 @@ struct ButtonView<OnButtonLabelView: View>: View {
                 }
                 
                 Text(belowBtnLabel)
-                    .font(.footnote.monospaced().weight(.semibold))
+                    .font(.caption2.monospaced().weight(.semibold))
                     .foregroundStyle(Colors.labelColorGrey)
             }
             .padding(EdgeInsets(top: 12, leading: 2, bottom: 0, trailing: 0))

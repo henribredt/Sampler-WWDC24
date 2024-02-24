@@ -85,6 +85,7 @@ struct KeypadView: View {
                         audioPlayer.playSystemSound(.invalidAction)
                     }
                 }, longPressAction: {
+                    audioPlayer.playSystemSound(.invalidAction)
                 })
                 
             }
@@ -128,6 +129,7 @@ struct KeypadView: View {
                         audioPlayer.playSystemSound(.invalidAction)
                     }
                 }, longPressAction: {
+                    audioPlayer.playSystemSound(.invalidAction)
                 })
             }
             
@@ -277,6 +279,8 @@ struct KeypadView: View {
             case .gain:
                 audioPlayer.editGain(for: bank, value: .reset)
             }
+        } else {
+            audioPlayer.playSystemSound(.invalidAction)
         }
     }
 }
