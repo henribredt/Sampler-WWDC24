@@ -171,6 +171,8 @@ struct KeypadView: View {
                         appState.selectedEffect = nil
                         appState.selectedBank = nil
                     } else {
+                        recorder.isPreRrecoring = true
+                        appState.selectedEffect = nil
                         audioPlayer.resetEffectsAndEdits(for: selectedBank)
                         let systemSoundDuration = audioPlayer.playSystemSound(.recCountDown)
                         
@@ -178,6 +180,7 @@ struct KeypadView: View {
                             // Audio has finished playing, update playingBanks on the main thread
                             DispatchQueue.main.async {
                                 recorder.startRecording(fileName: selectedBank.getFileName())
+                                recorder.isPreRrecoring = false
                                 timer.invalidate()
                             }
                         }

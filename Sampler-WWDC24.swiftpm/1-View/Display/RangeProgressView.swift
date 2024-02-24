@@ -28,7 +28,7 @@ struct RangeProgressView: View {
                     .blur(radius: 1)
                     .frame(width: 16, height: 16)
                     .foregroundStyle(isOn ? Colors.displayOrangeColorOn : Colors.displayOrangeColorOff)
-                    .offset(y: 2)
+                    .offset(y: 6)
                     .offset(x: self.calculateTrianglePosition())
         }
     }

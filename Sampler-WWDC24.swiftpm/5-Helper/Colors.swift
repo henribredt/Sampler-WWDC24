@@ -14,18 +14,13 @@ struct Colors {
     
     static let printedOnDeviceColor = Color(hex: "B8B8B8")
     
-    static let displayPrimaryColorOff = Color(hex: "626262")
-    static let displayPrimaryColorOn = Color(hex: "E3E3E3")
     static let displayOrangeColorOff = Color(hex: "511202")
     static let displayOrangeColorOn = Color(hex: "FD3300")
     static let displayPurpleColorOn = Color(hex: "2C61FF")
     static let displayPurpleColorOff = Color(hex: "0D1E51")
-    static let displayGreenColorOn = Color(hex: "25C482")
-    static let displayGreenColorOff = Color(hex: "0D4930")
     
     static let labelColorWhite = Color(hex: "E5E5E5")
     static let labelColorGrey = Color(hex: "4B4B4B")
-    
     
     static let deviceColorGradient = LinearGradient(gradient: Gradient(colors: [Color(hex: "C8C8C8"), Color(hex: "A1A1A1")]), startPoint: .topLeading, endPoint: .bottomTrailing)
     

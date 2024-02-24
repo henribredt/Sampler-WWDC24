@@ -2,8 +2,8 @@ import SwiftUI
 
 struct BlinkingBackgroundModifier: ViewModifier {
     let isBlinking: Bool
-    let color1 = Colors.offStatusLEDGradient
-    let color2 = Colors.onStatusLEDGradient
+    let color1: LinearGradient
+    let color2: LinearGradient
     
     @State private var internalBlinkingState = false
     
@@ -15,7 +15,7 @@ struct BlinkingBackgroundModifier: ViewModifier {
                 .foregroundStyle(internalBlinkingState ? color1 : color2)
                 .onAppear {
                     if isBlinking {
-                        withAnimation(Animation.linear(duration: 0.05).delay(0.25).repeatForever()) {
+                        withAnimation(Animation.linear(duration: 0.05).delay(0.2).repeatForever()) {
                             internalBlinkingState = true
                         }
                     }
@@ -29,6 +29,10 @@ struct BlinkingBackgroundModifier: ViewModifier {
 
 extension View {
     func blinking(isBlinking: Bool) -> some View {
-        self.modifier(BlinkingBackgroundModifier(isBlinking: isBlinking))
+        self.modifier(BlinkingBackgroundModifier(isBlinking: isBlinking, color1: Colors.offStatusLEDGradient, color2: Colors.onStatusLEDGradient))
     }
+    
+    func blinking(isBlinking: Bool, color1: LinearGradient, color2: LinearGradient) -> some View {
+            self.modifier(BlinkingBackgroundModifier(isBlinking: isBlinking, color1: color1, color2: color2))
+        }
 }

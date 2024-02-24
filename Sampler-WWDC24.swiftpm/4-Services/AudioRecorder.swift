@@ -10,6 +10,7 @@ import AVFoundation
 
 class AudioRecorder : NSObject, ObservableObject {
     @Published var isRecording : Bool = false
+    @Published var isPreRrecoring: Bool = false // lets the display element flash before recoring
     @Published var audioRecorder: AVAudioRecorder!
 
     func startRecording(fileName: String) {

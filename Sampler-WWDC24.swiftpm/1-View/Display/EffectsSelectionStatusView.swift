@@ -12,10 +12,10 @@ struct EffectsSelectionStatusView: View {
     
     var body: some View {
         HStack{
-            DisplayTextItemView(text: "gain", isOn: appState.selectedEffect == .gain, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
-            DisplayTextItemView(text: "pitch", isOn: appState.selectedEffect == .pitch, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
-            DisplayTextItemView(text: "low pass", isOn: appState.selectedEffect == .lowpass, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
-            DisplayTextItemView(text: "trim", isOn: appState.selectedEffect == .trimFromStart, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
+            DisplayTextItemView(text: "gain", size: .small, isOn: appState.selectedEffect == .gain, isBlinking: false, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
+            DisplayTextItemView(text: "pitch", size: .small, isOn: appState.selectedEffect == .pitch, isBlinking: false, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
+            DisplayTextItemView(text: "low pass", size: .small, isOn: appState.selectedEffect == .lowpass, isBlinking: false, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
+            DisplayTextItemView(text: "trim", size: .small, isOn: appState.selectedEffect == .trimFromStart, isBlinking: false, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
         }
     }
 }

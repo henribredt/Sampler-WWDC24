@@ -23,14 +23,14 @@ struct ContentView: View {
             } else {
                 VStack(spacing: 0){
                     Colors.displayColor
-                        .frame(height: 360)
+                        .frame(height: 400)
                         .overlay {
                             DisplayView()
                         }
                         .overlay(alignment: .bottomLeading) {
                             HStack{
                                 Rectangle()
-                                    .frame(width: 60, height: 1)
+                                    .frame(width: 67, height: 1)
                                     .foregroundStyle(Colors.printedOnDeviceColor)
                                 Text("POCKET SAMPLER WWDC24")
                                 Rectangle()

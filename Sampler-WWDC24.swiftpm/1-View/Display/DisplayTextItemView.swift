@@ -7,25 +7,39 @@
 
 import SwiftUI
 
+enum DisplayItemSize {
+    case small, large
+}
+
 struct DisplayTextItemView: View {
     let text: String
+    let size: DisplayItemSize
     let isOn: Bool
+    let isBlinking: Bool
     let onColor: Color
     let offColor: Color
     
+    var fillColorOn: LinearGradient { LinearGradient(colors: [onColor], startPoint: .top, endPoint: .bottom)
+    }
+    var fillColorOff: LinearGradient { LinearGradient(colors: [offColor], startPoint: .top, endPoint: .bottom)
+        }
+    
     var body: some View {
         Text(text)
-            .displayFont()
+            .displayFont(size: size)
             .fontWeight(.black)
             .foregroundStyle(Colors.displayColor)
-            .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
+            .padding(.vertical, size == .small ? 2 : 3)
+            .padding(.horizontal, size == .small ? 6 : 9)
             .background(
                 RoundedRectangle(cornerRadius: 3)
-                    .foregroundStyle(isOn ? onColor : offColor)
+                    .blinking(isBlinking: isBlinking, color1: fillColorOff, color2: fillColorOn)
+                    .foregroundStyle(isBlinking ? offColor : isOn ? onColor : offColor)
             )
+           
             .blur(radius: 0.5)
     }
 }
 #Preview {
-    DisplayTextItemView(text: "1", isOn: true, onColor: Color.red, offColor: Color.blue)
+    DisplayTextItemView(text: "1", size: .small, isOn: true, isBlinking: false, onColor: Color.red, offColor: Color.blue)
 }
