@@ -12,7 +12,7 @@ struct KeypadView: View {
     @EnvironmentObject var recorder: AudioRecorder
     @EnvironmentObject var audioEngine: AudioEngine
     
-    let audioPlayer: MultiAudioPlayer
+    let audioPlayer: AudioPlayer
     
     var body: some View {
         VStack(spacing: 29) {
@@ -118,7 +118,7 @@ struct KeypadView: View {
                         
                     }
                 }, longPressAction: {
-                    
+                    audioPlayer.playSystemSound(.recCountDown)
                 })
                 
             }
@@ -219,6 +219,7 @@ struct KeypadView: View {
     }
     
     func bankLongPressAction(_ bank: Bank) {
+        audioPlayer.stopAllPlayers()
         appState.toggleSelectedBank(base: bank)
     }
     
@@ -239,6 +240,6 @@ struct KeypadView: View {
 }
 
 #Preview {
-    KeypadView(audioPlayer: MultiAudioPlayer(audioEngine: AudioEngine()))
+    KeypadView(audioPlayer: AudioPlayer(audioEngine: AudioEngine()))
 }
 

@@ -21,8 +21,9 @@ class AudioEngine: ObservableObject {
     }
     
     func configureAudioEngine() {
-        // Connect nodes in the audio engine
-        for _ in 0..<9 {
+        // Create 10 players: 9 for Sample playing and 1 (the last) for system sounds
+        for _ in 0..<10 {
+            // Connect nodes in the audio engine
             let audioPlayer = AVAudioPlayerNode()
             audioEngine.attach(audioPlayer)
             audioPlayers.append(audioPlayer)
@@ -42,6 +43,34 @@ class AudioEngine: ObservableObject {
             try audioEngine.start()
         } catch {
             print("Error starting audio engine: \(error.localizedDescription)")
+        }
+    }
+    
+    func playSystemSound(_ systemSound: SystemSound) {
+        guard 9 < audioPlayers.count else { return }
+        
+        let audioPlayer = audioPlayers[9] // the last player is reserved for system sounds
+        
+        audioPlayer.stop()
+        audioPlayer.reset()
+        
+        audioPlayer.volume = 0.3
+        
+        audioEngine.connect(audioPlayer, to: audioEngine.mainMixerNode, format: nil)
+        
+        do {
+            let audioFile = try AVAudioFile(forReading: systemSound.getURL())
+            audioPlayer.scheduleFile(audioFile, at: nil)
+            
+            // For whatever reason, this is required for running it in Swift Playgrounds.
+            // Works fine without it when running from Xcode
+            if !audioEngine.isRunning {
+                try? audioEngine.start()
+            }
+            
+            audioPlayer.play()
+        } catch {
+            print("Error loading system sound file: \(error.localizedDescription)")
         }
     }
     
@@ -114,10 +143,11 @@ class AudioEngine: ObservableObject {
                 }
         } catch {
             print("Error loading sound file: \(error.localizedDescription)")
+            playSystemSound(.invalidAction)
         }
         
         #if DEBUG
-        print("Active playerTimers \(playerTimerDictionary.count)/9")
+        print("Active sample playerTimers \(playerTimerDictionary.count)/9")
         if playerTimerDictionary.count > 9 {
             fatalError("More playerTimers than allowed are running. Looks like timers are not properly invalidated.")
         }
@@ -130,6 +160,11 @@ class AudioEngine: ObservableObject {
             audioPlayer.reset()
         }
         resetPlayingBanks()
+        
+        for (_, timer) in playerTimerDictionary {
+            timer.invalidate()
+        }
+        playerTimerDictionary.removeAll()
     }
     
     // Helper method to invalidate the timer for a specific player

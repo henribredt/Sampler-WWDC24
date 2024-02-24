@@ -15,7 +15,7 @@ enum Effect {
         case .pitch:
             return 0
         case .lowpass:
-            return 3500
+            return 4000
         case .gain:
             return 0.55
         }

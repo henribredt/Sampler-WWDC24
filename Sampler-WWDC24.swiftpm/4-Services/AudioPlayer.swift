@@ -7,8 +7,16 @@
 
 import Foundation
 
-struct MultiAudioPlayer {
+struct AudioPlayer {
     let audioEngine: AudioEngine
+    
+    func playSystemSound(_ systemSound: SystemSound) {
+        audioEngine.playSystemSound(systemSound)
+    }
+    
+    func stopAllPlayers() {
+        audioEngine.stopAllSounds()
+    }
     
     func play(_ bank: Bank) {
         
@@ -34,7 +42,7 @@ enum EditValue {
 }
 
 // MARK: Sound effects and edits
-extension MultiAudioPlayer {
+extension AudioPlayer {
     
     func resetEffectsAndEdits(for bank: Bank){
         let config = BankPlayerConfig.newDefault()
@@ -44,6 +52,7 @@ extension MultiAudioPlayer {
     //MARK: PITCH
     func editPitch(for bank: Bank, value edit: EditValue) {
         var config: BankPlayerConfig
+        var skipPlay = false
         
         if let oldConfig = BankPlayerConfig.load(for: bank) {
             config = oldConfig
@@ -54,20 +63,33 @@ extension MultiAudioPlayer {
         
         switch edit {
         case .increase:
-            config.pitch += 200
+            if config.pitch < 2200 {
+                config.pitch += 200
+            } else {
+                playSystemSound(.invalidAction)
+                skipPlay = true
+            }
         case .decrease:
-            config.pitch -= 200
+            if config.pitch > -2000 {
+                config.pitch -= 200
+            } else {
+                playSystemSound(.invalidAction)
+                skipPlay = true
+            }
         case .reset:
             config.pitch = Effect.pitch.defaultValue()
         }
         
-        BankPlayerConfig.save(config, for: bank)
-        play(bank)
+        if !skipPlay {
+            BankPlayerConfig.save(config, for: bank)
+            play(bank)
+        }
     }
     
     //MARK: LOWPASS
         func editLowPassFilter(for bank: Bank, value edit: EditValue) {
             var config: BankPlayerConfig
+            var skipPlay = false
             
             if let oldConfig = BankPlayerConfig.load(for: bank) {
                 config = oldConfig
@@ -78,22 +100,33 @@ extension MultiAudioPlayer {
             
             switch edit {
             case .increase:
-                config.lowPassFrequency += 250
+                if config.lowPassFrequency < 20000 {
+                    config.lowPassFrequency += 250
+                } else {
+                    playSystemSound(.invalidAction)
+                    skipPlay = true
+                }
             case .decrease:
-                if config.lowPassFrequency >= 250{
+                if config.lowPassFrequency > 250{
                     config.lowPassFrequency -= 250
+                } else {
+                    playSystemSound(.invalidAction)
+                    skipPlay = true
                 }
             case .reset:
                 config.lowPassFrequency = Effect.lowpass.defaultValue()
             }
             
-            BankPlayerConfig.save(config, for: bank)
-            play(bank)
+            if !skipPlay {
+                BankPlayerConfig.save(config, for: bank)
+                play(bank)
+            }
         }
     
     //MARK: GAIN
     func editGain(for bank: Bank, value edit: EditValue) {
         var config: BankPlayerConfig
+        var skipPlay = false
         
         if let oldConfig = BankPlayerConfig.load(for: bank) {
             config = oldConfig
@@ -106,16 +139,24 @@ extension MultiAudioPlayer {
         case .increase:
             if config.gain < 0.95 {
                 config.gain += 0.1
+            } else {
+                playSystemSound(.invalidAction)
+                skipPlay = true
             }
         case .decrease:
             if config.gain > 0.06 {
                 config.gain -= 0.1
+            } else {
+                playSystemSound(.invalidAction)
+                skipPlay = true
             }
         case .reset:
             config.gain = Effect.gain.defaultValue()
         }
-        print("Gain: \(config.gain)")
-        BankPlayerConfig.save(config, for: bank)
-        play(bank)
+        
+        if !skipPlay {
+            BankPlayerConfig.save(config, for: bank)
+            play(bank)
+        }
     }
 }

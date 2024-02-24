@@ -28,8 +28,14 @@ struct ContentView: View {
                         }
                     
                     Colors.deviceColorGradient
+                        .overlay(alignment: .topLeading, content: {
+                            Text("POCKET SAMPLER WWDC24")
+                                .padding()
+                                .font(.caption.monospaced().weight(.semibold))
+                                .foregroundStyle(Colors.labelColorGrey)
+                        })
                         .overlay{
-                            KeypadView(audioPlayer: MultiAudioPlayer(audioEngine: audioEngine))
+                            KeypadView(audioPlayer: AudioPlayer(audioEngine: audioEngine))
                         }
                 }
                 
