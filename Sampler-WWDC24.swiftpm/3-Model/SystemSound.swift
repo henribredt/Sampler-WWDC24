@@ -13,7 +13,7 @@ enum SystemSound {
     func getURL() -> URL {
         switch self {
         case .recCountDown:
-            return Bundle.main.url(forResource: "drum", withExtension: "mp3")!
+            return Bundle.main.url(forResource: "recCountDown", withExtension: "mp3")!
         case .invalidAction:
             return Bundle.main.url(forResource: "rangeBoundaryReached", withExtension: "wav")!
         }

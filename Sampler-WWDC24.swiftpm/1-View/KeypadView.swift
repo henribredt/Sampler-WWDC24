@@ -115,10 +115,10 @@ struct KeypadView: View {
                         case .none:
                             return
                         }
-                        
+                    } else {
+                        audioPlayer.playSystemSound(.invalidAction)
                     }
                 }, longPressAction: {
-                    audioPlayer.playSystemSound(.recCountDown)
                 })
                 
             }
@@ -158,6 +158,8 @@ struct KeypadView: View {
                         case .none:
                             return
                         }
+                    } else {
+                        audioPlayer.playSystemSound(.invalidAction)
                     }
                 }, longPressAction: {
                 })
@@ -186,41 +188,64 @@ struct KeypadView: View {
                 
                 ButtonView(kind: .rec, onButtonLabelView: { Text("REC") }, belowBtnLabel: "REC", showStatusLED: true, statusLEDisOn: recorder.isRecording, statusLEDisBlinking: false, tapAction: {
                     guard let selectedBank = appState.selectedBank else {
+                        audioPlayer.playSystemSound(.invalidAction)
                         return
                     }
                     
                     if recorder.isRecording {
-                        recorder.audioRecorder.stop()
-                        recorder.isRecording = false
+                        recorder.stopRecording()
                         appState.selectedEffect = nil
                         appState.selectedBank = nil
                     } else {
                         audioPlayer.resetEffectsAndEdits(for: selectedBank)
-                        recorder.startRecording(fileName: selectedBank.getFileName())
-                        recorder.isRecording = true
+                        let systemSoundDuration = audioPlayer.playSystemSound(.recCountDown)
+                        
+                        let timer = Timer.scheduledTimer(withTimeInterval: systemSoundDuration, repeats: false) { timer in
+                            // Audio has finished playing, update playingBanks on the main thread
+                            DispatchQueue.main.async {
+                                recorder.startRecording(fileName: selectedBank.getFileName())
+                                timer.invalidate()
+                            }
+                        }
                     }
                     
                 }, longPressAction: {
-                    
+                    if recorder.isRecording {
+                        recorder.stopRecording()
+                    } else {
+                        audioPlayer.playSystemSound(.invalidAction)
+                    }
                 })
             }
         }
     }
     
     func bankTapAction(_ bank: Bank) {
+        
         if appState.selectedBank == nil || appState.selectedBank == bank {
             // play sample if system is not in edit mode or if in edit mode of this bank
             audioPlayer.play(bank)
+        } else {
+            if !recorder.isRecording {
+                // replace this with a solo  display warning
+                audioPlayer.playSystemSound(.invalidAction)
+            }
+        }
+    }
+    
+    func bankLongPressAction(_ bank: Bank) {
+        if recorder.isRecording {
+            recorder.stopRecording()
+        }
+        
+        if appState.selectedBank == nil || appState.selectedBank == bank {
+            audioPlayer.stopAllPlayers()
+            appState.toggleSelectedBank(base: bank)
         } else {
             // copy currentActiveBank to this bank and play
             copySampleFromSelectedTo(bank: bank)
             audioPlayer.play(bank)
         }
-    }
-    
-    func bankLongPressAction(_ bank: Bank) {
-        audioPlayer.stopAllPlayers()
-        appState.toggleSelectedBank(base: bank)
     }
     
     

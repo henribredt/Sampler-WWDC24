@@ -30,11 +30,19 @@ class AudioRecorder : NSObject, ObservableObject {
                 AVSampleRateKey: 44100.0
             ]
             
+            isRecording = true
+            
             audioRecorder = try AVAudioRecorder(url: audioURL, settings: settings)
             audioRecorder.record()
-            
         } catch {
             print("Error setting up recording session: \(error.localizedDescription)")
+        }
+    }
+    
+    func stopRecording() {
+        if audioRecorder.isRecording {
+            audioRecorder.stop()
+            isRecording = false
         }
     }
 }

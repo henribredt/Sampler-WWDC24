@@ -10,8 +10,10 @@ import Foundation
 struct AudioPlayer {
     let audioEngine: AudioEngine
     
-    func playSystemSound(_ systemSound: SystemSound) {
-        audioEngine.playSystemSound(systemSound)
+    /// - returns: Duration of the playing systemSound
+    @discardableResult
+    func playSystemSound(_ systemSound: SystemSound) -> Double {
+        return audioEngine.playSystemSound(systemSound)
     }
     
     func stopAllPlayers() {

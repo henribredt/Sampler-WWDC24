@@ -46,8 +46,12 @@ class AudioEngine: ObservableObject {
         }
     }
     
-    func playSystemSound(_ systemSound: SystemSound) {
-        guard 9 < audioPlayers.count else { return }
+    /// - returns: Duration of the playing systemSound
+    @discardableResult
+    func playSystemSound(_ systemSound: SystemSound) -> Double {
+        var soundLength: Double = 0.0
+        
+        guard 9 < audioPlayers.count else { return soundLength }
         
         let audioPlayer = audioPlayers[9] // the last player is reserved for system sounds
         
@@ -62,6 +66,8 @@ class AudioEngine: ObservableObject {
             let audioFile = try AVAudioFile(forReading: systemSound.getURL())
             audioPlayer.scheduleFile(audioFile, at: nil)
             
+            soundLength = Double(audioFile.length) / audioFile.processingFormat.sampleRate
+            
             // For whatever reason, this is required for running it in Swift Playgrounds.
             // Works fine without it when running from Xcode
             if !audioEngine.isRunning {
@@ -72,6 +78,8 @@ class AudioEngine: ObservableObject {
         } catch {
             print("Error loading system sound file: \(error.localizedDescription)")
         }
+        
+        return soundLength
     }
     
     func playSound(fileURL: URL, playerIndex: Int, pitch: Float = Effect.pitch.defaultValue(), lowPassFrequency: Float = Effect.lowpass.defaultValue(), gain: Float = Effect.gain.defaultValue()) {
