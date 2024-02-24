@@ -19,65 +19,31 @@ struct KeypadView: View {
             HStack(spacing: 30) {
                 ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "plus.forwardslash.minus") }, belowBtnLabel: "PITCH", showStatusLED: true,
                            statusLEDisOn: appState.selectedEffect == .pitch, statusLEDisBlinking: false, tapAction: {
-                    
-                    // disable selected bank on tap after edit
-                    if appState.selectedEffect == .pitch && appState.selectedBank != nil {
-                        appState.selectedBank = nil
-                        appState.selectedEffect = nil
-                    }
-                    
-                    if appState.selectedBank != nil {
-                        appState.toggleSelectedEffect(base: .pitch)
-                    }
+                    effectTapAction(effect: .pitch)
                 }, longPressAction: {
-                    // reset pitch effect
-                    if let bank = appState.selectedBank {
-                        audioPlayer.editPitch(for: bank, value: .reset)
-                    }
+                    effectLongPressAction(effect: .pitch)
                 })
                 
                 
                 ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "line.3.horizontal.decrease") }, belowBtnLabel: "LOW PASS", showStatusLED: true,
                            statusLEDisOn: appState.selectedEffect == .lowpass, statusLEDisBlinking: false, tapAction: {
-                    // disable selected bank on tap after edit
-                    if appState.selectedEffect == .lowpass && appState.selectedBank != nil {
-                        appState.selectedBank = nil
-                        appState.selectedEffect = nil
-                    }
-                    
-                    if appState.selectedBank != nil {
-                        appState.toggleSelectedEffect(base: .lowpass)
-                    }
+                    effectTapAction(effect: .lowpass)
                 }, longPressAction: {
-                    // reset lowpass effect
-                    if let bank = appState.selectedBank {
-                        audioPlayer.editLowPassFilter(for: bank, value: .reset)
-                    }
+                    effectLongPressAction(effect: .lowpass)
                 })
                 
                 ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "scissors") }, belowBtnLabel: "TRIM", showStatusLED: true,
                            statusLEDisOn: appState.selectedEffect == .gain, statusLEDisBlinking: false, tapAction: {
-                    
+                    audioPlayer.playSystemSound(.toggleOff)
                 }, longPressAction: {
                     
                 })
                 
                 ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "speaker.wave.1") }, belowBtnLabel: "GAIN", showStatusLED: true,
                            statusLEDisOn: appState.selectedEffect == .gain, statusLEDisBlinking: false, tapAction: {
-                    // disable selected bank on tap after edit
-                    if appState.selectedEffect == .gain && appState.selectedBank != nil {
-                        appState.selectedBank = nil
-                        appState.selectedEffect = nil
-                    }
-                    
-                    if appState.selectedBank != nil {
-                        appState.toggleSelectedEffect(base: .gain)
-                    }
+                    effectTapAction(effect: .gain)
                 }, longPressAction: {
-                    // reset lowpass effect
-                    if let bank = appState.selectedBank {
-                        audioPlayer.editGain(for: bank, value: .reset)
-                    }
+                    effectLongPressAction(effect: .gain)
                 })
             }
             
@@ -194,6 +160,7 @@ struct KeypadView: View {
                     
                     if recorder.isRecording {
                         recorder.stopRecording()
+                        audioPlayer.playSystemSound(.toggleOff)
                         appState.selectedEffect = nil
                         appState.selectedBank = nil
                     } else {
@@ -211,6 +178,7 @@ struct KeypadView: View {
                     
                 }, longPressAction: {
                     if recorder.isRecording {
+                        audioPlayer.playSystemSound(.toggleOff)
                         recorder.stopRecording()
                     } else {
                         audioPlayer.playSystemSound(.invalidAction)
@@ -240,11 +208,23 @@ struct KeypadView: View {
         
         if appState.selectedBank == nil || appState.selectedBank == bank {
             audioPlayer.stopAllPlayers()
-            appState.toggleSelectedBank(base: bank)
+            let toggleResult = appState.toggleSelectedBank(base: bank)
+            if toggleResult != nil {
+                audioPlayer.playSystemSound(.toggleOn)
+            } else {
+                audioPlayer.playSystemSound(.toggleOff)
+            }
         } else {
             // copy currentActiveBank to this bank and play
             copySampleFromSelectedTo(bank: bank)
-            audioPlayer.play(bank)
+            let systemSoundDuration = audioPlayer.playSystemSound(.toggleOff)
+            let timer = Timer.scheduledTimer(withTimeInterval: systemSoundDuration, repeats: false) { timer in
+                // Audio has finished playing, update playingBanks on the main thread
+                DispatchQueue.main.async {
+                    audioPlayer.play(bank)
+                    timer.invalidate()
+                }
+            }
         }
     }
     
@@ -261,6 +241,43 @@ struct KeypadView: View {
         
         appState.selectedEffect = nil
         appState.selectedBank = nil
+    }
+    
+    func effectTapAction(effect: Effect) {
+        if recorder.isRecording {
+            return
+        }
+        
+        // disable selected bank on tap after edit
+        if appState.selectedEffect == effect && appState.selectedBank != nil {
+            appState.selectedBank = nil
+            appState.selectedEffect = nil
+            audioPlayer.playSystemSound(.toggleOff)
+        }
+        
+        if appState.selectedBank != nil {
+            appState.toggleSelectedEffect(base: effect)
+        } else {
+            audioPlayer.playSystemSound(.invalidAction)
+        }
+    }
+    
+    func effectLongPressAction(effect: Effect) {
+        if recorder.isRecording {
+            return
+        }
+        
+        // reset effect
+        if let bank = appState.selectedBank {
+            switch effect {
+            case .pitch:
+                audioPlayer.editPitch(for: bank, value: .reset)
+            case .lowpass:
+                audioPlayer.editLowPassFilter(for: bank, value: .reset)
+            case .gain:
+                audioPlayer.editGain(for: bank, value: .reset)
+            }
+        }
     }
 }
 

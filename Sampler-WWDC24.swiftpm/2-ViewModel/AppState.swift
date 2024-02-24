@@ -14,13 +14,16 @@ class AppState: ObservableObject {
     @Published var selectedBankHasPitchEdit: Bool = false
     @Published var selectedBankHasLowPassEdit: Bool = false
     
-    func toggleSelectedBank(base: Bank) {
+    @discardableResult
+    func toggleSelectedBank(base: Bank) -> Bank? {
         if selectedBank == nil || selectedBank != base {
             selectedBank = base
+            return base
         } else {
             selectedBank = nil
             // if no bank is selected, no effect should be selected too
             selectedEffect = nil
+            return nil
         }
     }
     
