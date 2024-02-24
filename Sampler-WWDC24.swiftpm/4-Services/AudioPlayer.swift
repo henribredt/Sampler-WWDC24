@@ -31,7 +31,7 @@ struct AudioPlayer {
             return
         }
         
-        audioEngine.playSound(fileURL: audioFileURL, playerIndex: playerIndex, pitch: config.pitch, lowPassFrequency: config.lowPassFrequency, gain: config.gain)
+        audioEngine.playSound(fileURL: audioFileURL, playerIndex: playerIndex, pitch: config.pitch, lowPassFrequency: config.lowPassFrequency, gain: config.gain, startTime: config.trimFromStart)
     }
     
     func isPlaying(bank: Bank) -> Bool {
@@ -160,5 +160,46 @@ extension AudioPlayer {
             BankPlayerConfig.save(config, for: bank)
             play(bank)
         }
+    }
+    
+    //MARK: TrimFromStart
+    func editTrimFromStart(for bank: Bank, value edit: EditValue) {
+        var config: BankPlayerConfig
+        var skipPlay = false
+        
+        if let oldConfig = BankPlayerConfig.load(for: bank) {
+            config = oldConfig
+        } else {
+            // if no config file was found, create a new default config
+            config = BankPlayerConfig.newDefault()
+        }
+        
+        switch edit {
+        case .increase:
+            if config.trimFromStart < 2 {
+                config.trimFromStart += 0.1
+            } else {
+                playSystemSound(.invalidAction)
+                skipPlay = true
+            }
+        case .decrease:
+            if config.trimFromStart > 0.15 {
+                config.trimFromStart -= 0.1
+            } else if config.trimFromStart > 0 {
+                config.trimFromStart = 0
+            } else {
+                playSystemSound(.invalidAction)
+                skipPlay = true
+            }
+        case .reset:
+            config.trimFromStart = Double(Effect.trimFromStart.defaultValue())
+        }
+        
+        if !skipPlay {
+            BankPlayerConfig.save(config, for: bank)
+            play(bank)
+        }
+        
+        print(config.trimFromStart)
     }
 }

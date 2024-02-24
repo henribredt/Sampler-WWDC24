@@ -17,13 +17,19 @@ struct KeypadView: View {
     var body: some View {
         VStack(spacing: 29) {
             HStack(spacing: 30) {
+                ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "speaker.wave.1") }, belowBtnLabel: "GAIN", showStatusLED: true,
+                           statusLEDisOn: appState.selectedEffect == .gain, statusLEDisBlinking: false, tapAction: {
+                    effectTapAction(effect: .gain)
+                }, longPressAction: {
+                    effectLongPressAction(effect: .gain)
+                })
+                
                 ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "plus.forwardslash.minus") }, belowBtnLabel: "PITCH", showStatusLED: true,
                            statusLEDisOn: appState.selectedEffect == .pitch, statusLEDisBlinking: false, tapAction: {
                     effectTapAction(effect: .pitch)
                 }, longPressAction: {
                     effectLongPressAction(effect: .pitch)
                 })
-                
                 
                 ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "line.3.horizontal.decrease") }, belowBtnLabel: "LOW PASS", showStatusLED: true,
                            statusLEDisOn: appState.selectedEffect == .lowpass, statusLEDisBlinking: false, tapAction: {
@@ -33,17 +39,10 @@ struct KeypadView: View {
                 })
                 
                 ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "scissors") }, belowBtnLabel: "TRIM", showStatusLED: true,
-                           statusLEDisOn: appState.selectedEffect == .gain, statusLEDisBlinking: false, tapAction: {
-                    audioPlayer.playSystemSound(.toggleOff)
+                           statusLEDisOn: appState.selectedEffect == .trimFromStart, statusLEDisBlinking: false, tapAction: {
+                    effectTapAction(effect: .trimFromStart)
                 }, longPressAction: {
-                    
-                })
-                
-                ButtonView(kind: .fx, onButtonLabelView: { Image(systemName: "speaker.wave.1") }, belowBtnLabel: "GAIN", showStatusLED: true,
-                           statusLEDisOn: appState.selectedEffect == .gain, statusLEDisBlinking: false, tapAction: {
-                    effectTapAction(effect: .gain)
-                }, longPressAction: {
-                    effectLongPressAction(effect: .gain)
+                    effectLongPressAction(effect: .trimFromStart)
                 })
             }
             
@@ -78,8 +77,10 @@ struct KeypadView: View {
                             audioPlayer.editLowPassFilter(for: bank, value: .increase)
                         case .gain:
                             audioPlayer.editGain(for: bank, value: .increase)
+                        case .trimFromStart:
+                            audioPlayer.editTrimFromStart(for: bank, value: .increase)
                         case .none:
-                            return
+                            audioPlayer.playSystemSound(.invalidAction)
                         }
                     } else {
                         audioPlayer.playSystemSound(.invalidAction)
@@ -122,8 +123,10 @@ struct KeypadView: View {
                             audioPlayer.editLowPassFilter(for: bank, value: .decrease)
                         case .gain:
                             audioPlayer.editGain(for: bank, value: .decrease)
+                        case .trimFromStart:
+                            audioPlayer.editTrimFromStart(for: bank, value: .decrease)
                         case .none:
-                            return
+                            audioPlayer.playSystemSound(.invalidAction)
                         }
                     } else {
                         audioPlayer.playSystemSound(.invalidAction)
@@ -169,7 +172,7 @@ struct KeypadView: View {
                         audioPlayer.resetEffectsAndEdits(for: selectedBank)
                         let systemSoundDuration = audioPlayer.playSystemSound(.recCountDown)
                         
-                        let timer = Timer.scheduledTimer(withTimeInterval: systemSoundDuration, repeats: false) { timer in
+                        _ = Timer.scheduledTimer(withTimeInterval: systemSoundDuration, repeats: false) { timer in
                             // Audio has finished playing, update playingBanks on the main thread
                             DispatchQueue.main.async {
                                 recorder.startRecording(fileName: selectedBank.getFileName())
@@ -220,7 +223,7 @@ struct KeypadView: View {
             // copy currentActiveBank to this bank and play
             copySampleFromSelectedTo(bank: bank)
             let systemSoundDuration = audioPlayer.playSystemSound(.toggleOff)
-            let timer = Timer.scheduledTimer(withTimeInterval: systemSoundDuration, repeats: false) { timer in
+            _ = Timer.scheduledTimer(withTimeInterval: systemSoundDuration, repeats: false) { timer in
                 // Audio has finished playing, update playingBanks on the main thread
                 DispatchQueue.main.async {
                     audioPlayer.play(bank)
@@ -278,6 +281,8 @@ struct KeypadView: View {
                 audioPlayer.editLowPassFilter(for: bank, value: .reset)
             case .gain:
                 audioPlayer.editGain(for: bank, value: .reset)
+            case .trimFromStart:
+                audioPlayer.editTrimFromStart(for: bank, value: .reset)
             }
         } else {
             audioPlayer.playSystemSound(.invalidAction)

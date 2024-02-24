@@ -21,6 +21,9 @@ struct BankPlayerConfig: Codable {
     /// Volume, Range: 0. .. 1
     var gain: Float
     
+    /// Trim audio file from start, in seconds 0 ... duration
+    var trimFromStart: Double
+    
     static func save(_ bankConfig: BankPlayerConfig, for bank: Bank) {
         do {
             let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -55,6 +58,6 @@ struct BankPlayerConfig: Codable {
 extension BankPlayerConfig {
     // returns a new, default BankPlayerConfig
     static func newDefault() -> BankPlayerConfig {
-        BankPlayerConfig(pitch: Effect.pitch.defaultValue(), lowPassFrequency: Effect.lowpass.defaultValue() , gain: Effect.gain.defaultValue())
+        BankPlayerConfig(pitch: Effect.pitch.defaultValue(), lowPassFrequency: Effect.lowpass.defaultValue() , gain: Effect.gain.defaultValue(), trimFromStart: Double(Effect.trimFromStart.defaultValue()))
     }
 }

@@ -11,8 +11,10 @@ class AppState: ObservableObject {
     @Published var selectedBank: Bank? = nil
     @Published var selectedEffect: Effect? = nil
     
-    @Published var selectedBankHasPitchEdit: Bool = false
-    @Published var selectedBankHasLowPassEdit: Bool = false
+    // for Display
+    @Published var selectedEffectMinValue: Double = 0
+    @Published var selectedEffectMaxValue: Double = 1
+    @Published var selectedEffectCurrentValue: Double = 0.5
     
     @discardableResult
     func toggleSelectedBank(base: Bank) -> Bank? {

@@ -82,7 +82,7 @@ class AudioEngine: ObservableObject {
         return soundLength
     }
     
-    func playSound(fileURL: URL, playerIndex: Int, pitch: Float = Effect.pitch.defaultValue(), lowPassFrequency: Float = Effect.lowpass.defaultValue(), gain: Float = Effect.gain.defaultValue()) {
+    func playSound(fileURL: URL, playerIndex: Int, pitch: Float = Effect.pitch.defaultValue(), lowPassFrequency: Float = Effect.lowpass.defaultValue(), gain: Float = Effect.gain.defaultValue(), startTime: Double = Double(Effect.trimFromStart.defaultValue())) {
         
         guard playerIndex < audioPlayers.count else { return }
         
@@ -110,14 +110,41 @@ class AudioEngine: ObservableObject {
         audioEngine.connect(audioPlayer, to: pitchEffect, format: nil)
         audioEngine.connect(pitchEffect, to: lowPassFilter, format: nil)
         audioEngine.connect(lowPassFilter, to: audioEngine.mainMixerNode, format: nil)
+    
         
-        // Load and schedule the sound file
+        // Load, trim and schedule the sound file
             do {
                 let audioFile = try AVAudioFile(forReading: fileURL)
-                audioPlayer.scheduleFile(audioFile, at: nil)
-
+                
+                // Read the entire audio file into a buffer
+                let audioFileBuffer = AVAudioPCMBuffer(pcmFormat: audioFile.processingFormat, frameCapacity: AVAudioFrameCount(audioFile.length))
+                try audioFile.read(into: audioFileBuffer!)
+                
+                // Calculate the starting frame based on startTime
+                let startingFrame = AVAudioFramePosition(startTime * audioFile.processingFormat.sampleRate)
+                
+                // Calculate the frame count for the remaining audio from the starting frame
+                let remainingFrameCount = AVAudioFrameCount(audioFileBuffer!.frameLength) - AVAudioFrameCount(startingFrame)
+                
+                // Create a new buffer to hold the trimmed audio data
+                let buffer = AVAudioPCMBuffer(pcmFormat: audioFile.processingFormat, frameCapacity: remainingFrameCount)
+                
+                // Copy the trimmed portion from the original buffer to the new buffer
+                buffer?.frameLength = remainingFrameCount
+                
+                for channel in 0..<Int(audioFile.processingFormat.channelCount) {
+                    let destination = buffer!.floatChannelData![channel]
+                    let source = audioFileBuffer!.floatChannelData![channel] + Int(startingFrame)
+                    memcpy(destination, source, Int(remainingFrameCount) * MemoryLayout<Float>.size)
+                }
+                
+                // Schedule the buffer for playback
+                audioPlayer.scheduleBuffer(buffer!, at: nil, options: .interrupts, completionHandler: nil)
+                
                 // Get the audio duration
-                let duration = Double(audioFile.length) / audioFile.processingFormat.sampleRate
+               // let duration = Double(audioFile.length) / audioFile.processingFormat.sampleRate
+                
+                let duration = Double(buffer!.frameLength) / audioFile.processingFormat.sampleRate
 
                 // Invalidate any existing timer for this player
                 invalidateTimer(forPlayer: audioPlayer)
