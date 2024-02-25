@@ -12,7 +12,7 @@ struct Colors {
     
     static let displayColor = Color(hex: "0F0F11")
     
-    static let printedOnDeviceColor = Color(hex: "B8B8B8")
+    static let printedOnDeviceColor = Color(hex: "989595")
     
     static let displayOrangeColorOff = Color(hex: "511202")
     static let displayOrangeColorOn = Color(hex: "FD3300")
