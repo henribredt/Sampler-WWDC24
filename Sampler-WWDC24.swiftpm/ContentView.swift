@@ -11,47 +11,56 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             if orientation.isLandscape {
-                Colors.orangeButtonGradient
-                    .overlay{
-                        VStack(spacing: 18){
-                            Image(systemName: "rectangle.portrait.rotate")
-                                .font(.largeTitle)
-                            Text("Please hold your iPad in Portrait orientarion")
-                        }
-                        .foregroundStyle(.white)
-                    }
+                notSupportedOrientationView
             } else {
-                VStack(spacing: 0){
-                    Colors.displayColor
-                        .frame(height: 420)
-                        .overlay {
-                            DisplayView()
-                        }
-                        .overlay(alignment: .bottomLeading) {
-                            HStack{
-                                Rectangle()
-                                    .frame(width: 67, height: 1)
-                                    .foregroundStyle(Colors.printedOnDeviceColor)
-                                Text("POCKET SAMPLER WWDC24")
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundStyle(Colors.printedOnDeviceColor)
-                            }
-                                .onDisplayPrint()               .padding()
-                        }
-                    
-                    Colors.deviceColorGradient
-                        .overlay{
-                            KeypadView(audioPlayer: AudioPlayer(audioEngine: audioEngine, appState: appState))
-                        }
-                }
-                .modifier(FloatingViewModifier(floatingContent: {
-                    ManualView()
-                }))
+                mainContentView
             }
         }
         .ignoresSafeArea(edges: .all)
         .detectOrientation($orientation)
+    }
+    
+    var notSupportedOrientationView: some View {
+        Colors.orangeButtonGradient
+            .overlay{
+                VStack(spacing: 18){
+                    Image(systemName: "rectangle.portrait.rotate")
+                        .font(.largeTitle)
+                    Text("Please hold your iPad in Portrait orientarion")
+                }
+                .foregroundStyle(.white)
+            }
+    }
+    
+    var mainContentView: some View {
+        VStack(spacing: 0){
+            Colors.displayColor
+                .frame(height: 420)
+                .overlay {
+                    DisplayView()
+                }
+                .overlay(alignment: .bottomLeading) {
+                    HStack{
+                        Rectangle()
+                            .frame(width: 67, height: 1)
+                            .foregroundStyle(Colors.printedOnDeviceColor)
+                        Text("POCKET SAMPLER WWDC24")
+                        Rectangle()
+                            .frame(height: 1)
+                            .foregroundStyle(Colors.printedOnDeviceColor)
+                    }
+                    .onDisplayPrint()
+                    .padding()
+                }
+            
+            Colors.deviceColorGradient
+                .overlay{
+                    KeypadView(audioPlayer: AudioPlayer(audioEngine: audioEngine, appState: appState))
+                }
+        }
+        .modifier(FloatingViewModifier(floatingContent: {
+            ManualView()
+        }))
     }
     
 }

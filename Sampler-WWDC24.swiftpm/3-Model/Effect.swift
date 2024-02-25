@@ -46,7 +46,7 @@ enum Effect {
         case .gain:
             return 0...1
         case .trimFromStart:
-            return 0...1.25
+            return 0...2
         }
     }
 }

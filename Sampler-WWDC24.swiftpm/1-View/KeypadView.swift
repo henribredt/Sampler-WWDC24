@@ -175,7 +175,7 @@ struct KeypadView: View {
                         recorder.isPreRrecoring = true
                         appState.selectedEffect = nil
                         audioPlayer.resetEffectsAndEdits(for: selectedBank)
-                        let systemSoundDuration = audioPlayer.playSystemSound(.recCountDown)
+                        let systemSoundDuration = audioPlayer.playSystemSound(.recCountDown) + 0.1
                         
                         _ = Timer.scheduledTimer(withTimeInterval: systemSoundDuration, repeats: false) { timer in
                             // Audio has finished playing, update playingBanks on the main thread

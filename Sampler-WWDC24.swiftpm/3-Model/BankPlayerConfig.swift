@@ -33,9 +33,9 @@ struct BankPlayerConfig: Codable {
             encoder.outputFormatting = .prettyPrinted
             let data = try encoder.encode(bankConfig)
             try data.write(to: url)
-            print("Person saved successfully as JSON")
+            print("Config saved successfully as JSON")
         } catch {
-            print("Error saving person as JSON: \(error.localizedDescription)")
+            print("Could not save config as JSON: \(error.localizedDescription)")
         }
     }
     
@@ -49,7 +49,7 @@ struct BankPlayerConfig: Codable {
             let bankConfig = try decoder.decode(BankPlayerConfig.self, from: data)
             return bankConfig
         } catch {
-            print("Error loading person from JSON: \(error.localizedDescription)")
+            print("No config saved yet. Could not load config from JSON: \(error.localizedDescription)")
             return nil
         }
     }
