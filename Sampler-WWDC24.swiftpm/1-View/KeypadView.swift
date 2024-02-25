@@ -81,13 +81,14 @@ struct KeypadView: View {
                         case .trimFromStart:
                             audioPlayer.editTrimFromStart(for: bank, value: .increase)
                         case .none:
-                            audioPlayer.playSystemSound(.invalidAction)
+                            appState.flashOnDisplay(info: .noSelection)
                         }
                     } else {
-                        audioPlayer.playSystemSound(.invalidAction)
+                       
+                        appState.flashOnDisplay(info: .noSelection)
                     }
                 }, longPressAction: {
-                    audioPlayer.playSystemSound(.invalidAction)
+                    appState.flashOnDisplay(info: .noSelection)
                 })
                 
             }
@@ -128,13 +129,13 @@ struct KeypadView: View {
                         case .trimFromStart:
                             audioPlayer.editTrimFromStart(for: bank, value: .decrease)
                         case .none:
-                            audioPlayer.playSystemSound(.invalidAction)
+                            appState.flashOnDisplay(info: .noSelection)
                         }
                     } else {
-                        audioPlayer.playSystemSound(.invalidAction)
+                        appState.flashOnDisplay(info: .noSelection)
                     }
                 }, longPressAction: {
-                    audioPlayer.playSystemSound(.invalidAction)
+                    appState.flashOnDisplay(info: .noSelection)
                 })
             }
             
@@ -161,7 +162,7 @@ struct KeypadView: View {
                 
                 ButtonView(kind: .rec, onButtonLabelView: { Text("REC") }, belowBtnLabel: "REC", showStatusLED: true, statusLEDisOn: recorder.isRecording, statusLEDisBlinking: false, tapAction: {
                     guard let selectedBank = appState.selectedBank else {
-                        audioPlayer.playSystemSound(.invalidAction)
+                        appState.flashOnDisplay(info: .noSelection)
                         return
                     }
                     
@@ -191,7 +192,7 @@ struct KeypadView: View {
                         audioPlayer.playSystemSound(.toggleOff)
                         recorder.stopRecording()
                     } else {
-                        audioPlayer.playSystemSound(.invalidAction)
+                        // do nothing
                     }
                 })
             }
@@ -204,10 +205,7 @@ struct KeypadView: View {
             // play sample if system is not in edit mode or if in edit mode of this bank
             audioPlayer.play(bank)
         } else {
-            if !recorder.isRecording {
-                // replace this with a solo  display warning
-                audioPlayer.playSystemSound(.invalidAction)
-            }
+            // do nothing
         }
     }
     
@@ -227,6 +225,7 @@ struct KeypadView: View {
         } else {
             // copy currentActiveBank to this bank and play
             copySampleFromSelectedTo(bank: bank)
+            appState.flashOnDisplay(info: .duplicated)
             let systemSoundDuration = audioPlayer.playSystemSound(.toggleOff)
             _ = Timer.scheduledTimer(withTimeInterval: systemSoundDuration, repeats: false) { timer in
                 // Audio has finished playing, update playingBanks on the main thread
@@ -258,17 +257,10 @@ struct KeypadView: View {
             return
         }
         
-        // disable selected bank on tap after edit
-        if appState.selectedEffect == effect && appState.selectedBank != nil {
-            appState.selectedBank = nil
-            appState.selectedEffect = nil
-            audioPlayer.playSystemSound(.toggleOff)
-        }
-        
         if appState.selectedBank != nil {
             appState.toggleSelectedEffect(base: effect)
         } else {
-            audioPlayer.playSystemSound(.invalidAction)
+            appState.flashOnDisplay(info: .noSelection)
         }
     }
     
@@ -289,12 +281,13 @@ struct KeypadView: View {
                 case .trimFromStart:
                     audioPlayer.editTrimFromStart(for: bank, value: .reset)
                 }
+                appState.flashOnDisplay(info: .fxReset)
             }
             else {
-                audioPlayer.playSystemSound(.invalidAction)
+                appState.flashOnDisplay(info: .noSelection)
             }
         } else {
-            audioPlayer.playSystemSound(.invalidAction)
+            appState.flashOnDisplay(info: .noSelection)
         }
     }
 }

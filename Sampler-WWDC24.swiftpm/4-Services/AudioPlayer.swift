@@ -25,14 +25,18 @@ struct AudioPlayer {
         
         let audioFileURL = FileSystemManager.audioFileURL(for: bank)
         let playerIndex = bank.playerIndex()
+        var playingWasSucessfull : Bool = false
         
-        guard let config = BankPlayerConfig.load(for: bank) else {
+        if let config = BankPlayerConfig.load(for: bank) {
+            // play with config
+            playingWasSucessfull = audioEngine.playSound(fileURL: audioFileURL, playerIndex: playerIndex, pitch: config.pitch, lowPassFrequency: config.lowPassFrequency, gain: config.gain, startTime: config.trimFromStart)
+        } else {
             // if no config file could be loaded, play without any adjustments
-            audioEngine.playSound(fileURL: audioFileURL, playerIndex: playerIndex)
-            return
+            playingWasSucessfull = audioEngine.playSound(fileURL: audioFileURL, playerIndex: playerIndex)
         }
         
-        audioEngine.playSound(fileURL: audioFileURL, playerIndex: playerIndex, pitch: config.pitch, lowPassFrequency: config.lowPassFrequency, gain: config.gain, startTime: config.trimFromStart)
+        // show UI info if no sample
+        if playingWasSucessfull == false { appState.flashOnDisplay(info: .noSample) }
     }
     
     func isPlaying(bank: Bank) -> Bool {
@@ -69,14 +73,14 @@ extension AudioPlayer {
             if config.pitch < Effect.pitch.range().upperBound {
                 config.pitch += Effect.pitch.stepSize()
             } else {
-                playSystemSound(.invalidAction)
+                appState.flashOnDisplay(info: .maxValue)
                 skipPlay = true
             }
         case .decrease:
             if config.pitch > Effect.pitch.range().lowerBound {
                 config.pitch -= Effect.pitch.stepSize()
             } else {
-                playSystemSound(.invalidAction)
+                appState.flashOnDisplay(info: .minValue)
                 skipPlay = true
             }
         case .reset:
@@ -107,14 +111,14 @@ extension AudioPlayer {
                 if config.lowPassFrequency < Effect.lowpass.range().upperBound {
                     config.lowPassFrequency += Effect.lowpass.stepSize()
                 } else {
-                    playSystemSound(.invalidAction)
+                    appState.flashOnDisplay(info: .minValue)
                     skipPlay = true
                 }
             case .decrease:
                 if config.lowPassFrequency > Effect.lowpass.range().lowerBound{
                     config.lowPassFrequency -= Effect.lowpass.stepSize()
                 } else {
-                    playSystemSound(.invalidAction)
+                    appState.flashOnDisplay(info: .maxValue)
                     skipPlay = true
                 }
             case .reset:
@@ -146,14 +150,14 @@ extension AudioPlayer {
             if config.gain < Effect.gain.range().upperBound {
                 config.gain = min(1, config.gain + Effect.gain.stepSize())
             } else {
-                playSystemSound(.invalidAction)
+                appState.flashOnDisplay(info: .maxValue)
                 skipPlay = true
             }
         case .decrease:
             if config.gain > Effect.gain.range().lowerBound {
                 config.gain = max(0, config.gain - Effect.gain.stepSize())
             } else {
-                playSystemSound(.invalidAction)
+                appState.flashOnDisplay(info: .minValue)
                 skipPlay = true
             }
         case .reset:
@@ -184,7 +188,7 @@ extension AudioPlayer {
             if config.trimFromStart < Double(Effect.trimFromStart.range().upperBound) {
                 config.trimFromStart += Double(Effect.trimFromStart.stepSize())
             } else {
-                playSystemSound(.invalidAction)
+                appState.flashOnDisplay(info: .maxValue)
                 skipPlay = true
             }
         case .decrease:
@@ -193,7 +197,7 @@ extension AudioPlayer {
             } else if config.trimFromStart > 0 {
                 config.trimFromStart = 0
             } else {
-                playSystemSound(.invalidAction)
+                appState.flashOnDisplay(info: .minValue)
                 skipPlay = true
             }
         case .reset:

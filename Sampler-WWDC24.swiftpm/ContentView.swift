@@ -23,7 +23,7 @@ struct ContentView: View {
             } else {
                 VStack(spacing: 0){
                     Colors.displayColor
-                        .frame(height: 400)
+                        .frame(height: 420)
                         .overlay {
                             DisplayView()
                         }

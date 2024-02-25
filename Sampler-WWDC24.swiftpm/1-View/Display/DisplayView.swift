@@ -51,15 +51,15 @@ struct DisplayView: View {
                 
                 HStack(spacing: 10){
                     VStack(alignment: .leading, spacing: 10){
-                        DisplayTextItemView(text: "No Selection", size: .small, isOn: false, isBlinking: false, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
-                        DisplayTextItemView(text: "Duplicated", size: .small, isOn: false, isBlinking: false, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
-                        DisplayTextItemView(text: "No sample", size: .small, isOn: false, isBlinking: false, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
+                        DisplayTextItemView(text: "No Selection", size: .small, isOn: false, isBlinking: appState.showInfoNoSelection, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
+                        DisplayTextItemView(text: "Duplicated", size: .small, isOn: false, isBlinking: appState.showInfoDuplicated, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
+                        DisplayTextItemView(text: "No sample", size: .small, isOn: false, isBlinking: appState.showInfoNoSample, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
                     }
                     VStack(alignment: .trailing, spacing: 10){
-                        DisplayTextItemView(text: "fx reset", size: .small, isOn: false, isBlinking: false, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
+                        DisplayTextItemView(text: "fx reset", size: .small, isOn: false, isBlinking: appState.showInfoFxReset, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
                        
-                        DisplayTextItemView(text: "max value", size: .small, isOn: false, isBlinking: false, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
-                        DisplayTextItemView(text: "min value", size: .small, isOn: false, isBlinking: false, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
+                        DisplayTextItemView(text: "max value", size: .small, isOn: false, isBlinking: appState.showInfoMaxValue, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
+                        DisplayTextItemView(text: "min value", size: .small, isOn: false, isBlinking: appState.showInfoMinValue, onColor: Colors.displayPurpleColorOn, offColor: Colors.displayPurpleColorOff)
                        
                        
                     }

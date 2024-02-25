@@ -82,9 +82,11 @@ class AudioEngine: ObservableObject {
         return soundLength
     }
     
-    func playSound(fileURL: URL, playerIndex: Int, pitch: Float = Effect.pitch.defaultValue(), lowPassFrequency: Float = Effect.lowpass.defaultValue(), gain: Float = Effect.gain.defaultValue(), startTime: Double = Double(Effect.trimFromStart.defaultValue())) {
+    /// - returns: True if played, false if failed
+    @discardableResult
+    func playSound(fileURL: URL, playerIndex: Int, pitch: Float = Effect.pitch.defaultValue(), lowPassFrequency: Float = Effect.lowpass.defaultValue(), gain: Float = Effect.gain.defaultValue(), startTime: Double = Double(Effect.trimFromStart.defaultValue())) -> Bool {
         
-        guard playerIndex < audioPlayers.count else { return }
+        guard playerIndex < audioPlayers.count else { return false }
         
         let audioPlayer = audioPlayers[playerIndex]
         
@@ -176,10 +178,10 @@ class AudioEngine: ObservableObject {
                 if let bank = Bank.from(playerIndex: playerIndex) {
                     addToPlayingBanks(bank)
                 }
-        } catch {
-            print("Error loading sound file: \(error.localizedDescription)")
-            playSystemSound(.invalidAction)
-        }
+            } catch {
+                print("Could not load sound file: \(error.localizedDescription)")
+                return false
+            }
         
         #if DEBUG
         print("Active sample playerTimers \(playerTimerDictionary.count)/9")
@@ -187,6 +189,8 @@ class AudioEngine: ObservableObject {
             fatalError("More playerTimers than allowed are running. Looks like timers are not properly invalidated.")
         }
         #endif
+        
+        return true
     }
     
     func stopAllSounds() {
