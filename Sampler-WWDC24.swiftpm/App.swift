@@ -15,9 +15,9 @@ struct SamplerApp: App {
                 .environmentObject(recoder)
                 .environmentObject(audioEngine)
                 .onAppear{
-                    //if !hasLaunchedBefore {
+                    if !hasLaunchedBefore {
                         FileSystemManager.loadDefaultSamples()
-                  //  }
+                    }
                 }
         }
     }

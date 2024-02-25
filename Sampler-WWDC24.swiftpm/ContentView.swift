@@ -45,7 +45,9 @@ struct ContentView: View {
                             KeypadView(audioPlayer: AudioPlayer(audioEngine: audioEngine, appState: appState))
                         }
                 }
-                
+                .modifier(FloatingViewModifier(floatingContent: {
+                    ManualView()
+                }))
             }
         }
         .ignoresSafeArea(edges: .all)
