@@ -7,12 +7,19 @@
 
 import SwiftUI
 
-struct ManualView: View {
+struct ManualView: View  {
+    @State private var isCollapsed: Bool = false
+    
     var body: some View {
         VStack{
             RoundedRectangle(cornerRadius: 100)
-                .frame(width: 60, height: 4)
+                .frame(width: 66, height: 5)
                 .foregroundStyle(Color.gray.opacity(0.2))
+                .onTapGesture {
+                    withAnimation {
+                        isCollapsed.toggle()
+                    }
+                }
                 .padding(EdgeInsets(top: 16, leading: 0, bottom: 16, trailing: 0))
             ScrollView{
                 ForEach(ManualContent.tutorial) { manualContent in
@@ -54,10 +61,10 @@ struct ManualView: View {
             }
         }
         .foregroundStyle(Color.black)
-        .frame(width: 280, height: 360)
+        .frame(width: 280, height: !isCollapsed ? 380 : 37)
         .padding(EdgeInsets(top: 0, leading: 4, bottom: 10, trailing: 4))
         .background{
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: !isCollapsed ? 12 : 10 )
                 .foregroundStyle(Colors.labelColorWhite)
                 .shadow(radius: 12, x:3, y: 3)
         }
@@ -86,55 +93,85 @@ struct ManualContent: Identifiable {
 extension ManualContent {
     static let tutorial : [ManualContent] = [
         ManualContent(
+            chapter: "Welcome to",
+            title: "Pocket Sampler WWDC24",
+            description: "I've built this Sampler as a submission to the Swift Student Challenge 2024. At the moment, you're looking at its user manual. This is where I explain how the Sampler works and show you some tips and tricks. But before we start, here are some things to note:",
+            steps: [
+                ManualContentStep(no: "1", text: "Make sure to hold your iPad in portrait orientation. Ensure the device is not muted and the volume is loud enough."),
+                ManualContentStep(no: "2", text: "You can drag this user manual around to uncover the areas of the sampler you want to interact with."),
+                ManualContentStep(no: "3", text: "Follow along with the user manual or explore on your own. Whenever you want, you can collapse this window by tapping the top handle and slide it away."),
+            ]),
+        ManualContent(
             chapter: "Chapter 1",
             title: "What's a Sampler?",
-            description: "A sampler is a device that records and plays back audio samples. This can be a valuable tool for musicians to explore new compositions. Before we start, here are some hints about this app:",
-            steps: [
-                ManualContentStep(no: "1", text: "You can move this \"User Guide\" around to uncover the areas of the sampler you need to interact with."),
-                ManualContentStep(no: "2", text: "Make sure you're device is in Portrait orientarion, the volume is turned on and to have some fun while making music :D"),
-                ManualContentStep(no: "3", text: "Follow along with the \"User Guide\" or explore on your own."),
-            ]),
+            description: "A sampler is a device that records and plays back audio samples. It's often used by musicians to explore new compositions. Even for non-musicians, sampling is a straightforward method to make music. It eliminates the need to learn traditional musical notation by replaying pre-recorded sounds and manipulating them creatively instead.",
+            steps: nil),
         ManualContent(
             chapter: "Chapter 2",
             title: "Play Samples",
-            description: "This Sampler has nine Sample Pads. You can spot them by their numerical label and the light gray color. Each Pad can hold a Sound Sample that playes when you tap it. PLAY mode is the default.",
+            description: "This sampler has nine sample pads. You can recognize them by their numerical label and the light gray color. Each sample pad can hold a sound sample that plays when you tap it.",
             steps: [
-                ManualContentStep(no: "1", text: "You can only play Samples, if you're in the PLAY mode. Check the mode by looking at the top left corner of the display."),
-                ManualContentStep(no: "2", text: "The Sampler comes with some Samples preinstalled on the first seven banks. But you can also replace them with your own samples, read more in the next Chapter."),
+                ManualContentStep(no: "1", text: "You can play samples when the device is in PLAY mode. Check the mode by looking at the top left corner of the display. PLAY mode is on by default. All sample pads can play simultaneously."),
+                ManualContentStep(no: "2", text: "This sampler comes with some samples pre-loaded on the first seven pads. You can replace them with your own samples, read more in the next chapter."),
+                ManualContentStep(no: "3", text: "It's your turn: Move the user manual out of the way and start playing some samples. Then come back to learn more."),
             ]),
         ManualContent(
             chapter: "Chapter 3",
             title: "Record Samples",
-            description: "The preinstalled Samples are for demo purposes. You'll unlock the real power of this sampler, once you create your own Samples by recoding with your iPads mic.",
+            description: "The pre-loaded samples are for demo purposes. You'll unlock the real power of this sampler, once you create your own samples by recording with your iPads mic.",
             steps: [
-                ManualContentStep(no: "1", text: "Find a Pad you want to record your new Sample to. Tap and hold the Pad until you can see that the Mode has changed to EDIT."),
-                ManualContentStep(no: "2", text: "Now press the orange REC button, you'll hear a Countdown. Your recording starts after the last \"Beep\" sound."),
-                ManualContentStep(no: "3", text: "Once you're done, hit REC again to stop the recording. The Mode automatically changes to PLAY mode. Now you can rap the Pad and you'll hear your new Sample."),
+                ManualContentStep(no: "1", text: "Find a pad you want to record your new sample to. Tap and hold the pad until you can see that the mode has changed to EDIT."),
+                ManualContentStep(no: "2", text: "Now press the orange REC button, you'll hear a countdown. Your recording starts after the last \"beep\" sound."),
+                ManualContentStep(no: "3", text: "Once you're done, hit REC again to stop the recording. The mode automatically changes back to PLAY mode. Now you can play the new sample with a tap on the pad you've recorded to."),
             ]),
         ManualContent(
             chapter: "Chapter 4",
             title: "Duplicate Samples",
-            description: "You can copy and paste a Sample from one Pad to another if you wish.",
+            description: "You can copy and paste a sample from one pad to another. This can be really powerful in combination with different effects on each copy. You'll learn about effects later. To duplicate a sample, do the following.",
             steps: [
-                ManualContentStep(no: "1", text: "Tap and hold the Pad you want to copy from to go to EDIT mode."),
-                ManualContentStep(no: "2", text: "Tap and hold the Pad you want to  copy the Sample to. That's it. PLAY mode is automatically activated and you'll hear the pasted Sample."),
+                ManualContentStep(no: "1", text: "Tap and hold the pad you want to copy from in order to activate EDIT mode."),
+                ManualContentStep(no: "2", text: "Tap and hold the pad you want to  copy the sample to. That's it. PLAY mode is automatically activated and you'll hear the pasted sample playing."),
             ]),
         ManualContent(
             chapter: "Chapter 5",
             title: "Edit Samples",
-            description: "This Sampler has four Effects (FX) build-in. They can be used to manipulate the Sound you've stored to a Pad. Gain, Pitch, a Low-Pass filter and a Trim function are available. Read more about the individual effects in the following chapters. All Effects are non-destructive and can be reset.",
+            description: "This sampler has four effects (FX) built-in. They can be used to manipulate the sound you've stored to a pad. Gain, Pitch, a Low-Pass filter and a Trim function are available. Read more about the individual effects in the following chapters. All effects are non-destructive and can be reset.",
             steps: [
-                ManualContentStep(no: "1", text: "Tap and hold a Pad you want to apply an Effect to in order to bring it into EDIT mode."),
-                ManualContentStep(no: "2", text: "Select the desired effect from  the dark-gray colored effects buttons."),
-                ManualContentStep(no: "3", text: "Adjust the Effect strength with the black + and - buttons. The red triangle in the Effects Display indicates your current effect strength."),
-                ManualContentStep(no: "4", text: "To reset the effect to the default effect strength, tap and hold the current dark-gray colored effect button."),
-                ManualContentStep(no: "5", text: "To exit EDIT mode, tap and hold the Pad you're editing. You're then back in play mode."),
+                ManualContentStep(no: "1", text: "Tap and hold a pad you want to apply an effect to in order to bring it into EDIT mode."),
+                ManualContentStep(no: "2", text: "Select the desired effect from the dark-gray colored effect buttons."),
+                ManualContentStep(no: "3", text: "Adjust the effect strength with the black + and - buttons. The red triangle in the effects display indicates your current effect strength."),
+                ManualContentStep(no: "4", text: "To reset an effect to the default effect strength, tap and hold the button of the effect you're editing."),
+                ManualContentStep(no: "5", text: "To exit EDIT mode, tap and hold the pad you're editing. You're then back in PLAY mode."),
             ]),
         ManualContent(
             chapter: "Chapter 6",
             title: "Gain FX",
-            description: "The Gain effect allows you to adjust the volume of a Sample. The red triangle in the Effects Display indicates your current effect strength. As the triangle moves from left to right, the volume increases. Tap + and - to adjust.",
+            description: "The GAIN effect allows you to adjust the volume of a sample. The red triangle in the effects display indicates the current effect strength. As the triangle moves from left to right, the volume increases. Tap + and - to adjust.",
         steps: nil
+        ),
+        ManualContent(
+            chapter: "Chapter 7",
+            title: "Pitch FX",
+            description: "With the PITCH effect, you can change the tonal pitch of a sample. Tap + and - to increase and decrease the pitch. One step represents a halftone. The red triangle in the effects display indicates the current effect strength.",
+            steps: nil
+        ),
+        ManualContent(
+            chapter: "Chapter 8",
+            title: "Low Pass Filter FX",
+            description: "The LOW PASS filter allows signals with a frequency lower than a certain cutoff frequency to pass through, suppressing higher-frequency components. This helps to remove static noise from the mic or to apply a stylistic effect. You can adjust the cutoff frequency by pressing the + and - buttons. When you press +, the cutoff is decreased, hence the effect becomes stronger. The red triangle in the effects display indicates the current effect strength.",
+            steps: nil
+        ),
+        ManualContent(
+            chapter: "Chapter 9",
+            title: "Trim FX",
+            description: "The TRIM tool allows you to trim a sample. This allows you to remove unwanted silence you might have picked up while recording before the actual sound has started. Tap + to begin cutting from the start. Every time you press +, you cut 0.05s from the start of the sample. Due to its non-destructive nature, you can use - to reduce the trim value. Only samples longer than 1.25s can be trimmed. The red triangle in the effects display indicates the current effect strength.",
+            steps: nil
+        ),
+        ManualContent(
+            chapter: "Imprint",
+            title: "About and Sources",
+            description: "This project was created by Henri Bredt in February 2024 as a submission to the Swift Student Challenge. All pre-loaded samples were made using GarageBand. This project utilizes sounds from https://snd.dev for system sounds. The usage is granted by license, allowing free use of the sound assets for commercial and non-commercial purposes. The UI design was partially inspired by teenage engineering EP–133 K.O. II and teenage engineering OP–1 field.",
+            steps: nil
         )
     ]
 }
