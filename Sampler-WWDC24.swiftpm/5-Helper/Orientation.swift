@@ -1,9 +1,4 @@
-//
-//  File.swift
-//  
-//
-//  Created by Henri Bredt on 23.02.24.
-//  Code by https://medium.com/devtechie/detect-device-orientation-in-swiftui-6521a67712ec
+//  Code inspired by https://medium.com/devtechie/detect-device-orientation-in-swiftui-6521a67712ec
 
 import SwiftUI
 

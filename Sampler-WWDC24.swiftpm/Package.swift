@@ -16,8 +16,6 @@ let package = Package(
         .iOSApplication(
             name: "Pocket Sampler",
             targets: ["AppModule"],
-            bundleIdentifier: "de.henribredt.pocket-sampler",
-            teamIdentifier: "8V3J763Y9A",
             displayVersion: "1.0",
             bundleVersion: "1",
             appIcon: .placeholder(icon: .note),
