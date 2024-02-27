@@ -1,7 +1,7 @@
 # Pocket Sampler
 Created as a Swift Student Challenge 2024 Submission by [Henri Bredt](https://twitter.com/henricreates) in February 2024.
 
-![PocketSampler](https://github.com/henribredt/Sampler-WWDC24/assets/57298155/d318c774-9efc-46cf-9d56-9f1e3c14c166)
+![PocketSampler](https://github.com/henribredt/Sampler-WWDC24/assets/57298155/bfdf850a-e870-4991-937e-d9a98c2a6f69)
 
 
 ## About
